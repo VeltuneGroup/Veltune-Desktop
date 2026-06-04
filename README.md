@@ -15,7 +15,7 @@
 Veltune Desktop is a community-maintained fork of the original YouTube Music desktop app.
 It keeps the Electron wrapper and plugin system while continuing development, fixes, and maintenance.
 
-Read this in other languages: [한국어](./docs/readme/README-ko.md), [Française](./docs/readme/README-fr.md), [Íslenska](./docs/readme/README-is.md), [Español](./docs/readme/README-es.md), [Pусский](./docs/readme/README-ru.md), [Українська](./docs/readme/README-uk.md), [Magyar](./docs/readme/README-hu.md), [Português](./docs/readme/README-pt.md), [日本語](./docs/readme/README-ja.md)
+
 
 ## Contents
 
