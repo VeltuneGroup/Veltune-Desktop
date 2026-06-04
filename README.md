@@ -10,11 +10,7 @@
 
 ![Screenshot](web/screenshot.png "Screenshot")
 
-<div align="center">
-	<a href="https://github.com/VeltuneGroup/Veltune-Desktop/releases/latest">
-		<img src="web/youtube-music.svg" width="400" height="100" alt="Veltune Desktop">
-	</a>
-</div>
+
 
 Veltune Desktop is a community-maintained fork of the original YouTube Music desktop app.
 It keeps the Electron wrapper and plugin system while continuing development, fixes, and maintenance.
