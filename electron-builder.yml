@@ -1,5 +1,9 @@
 appId: com.github.VeltuneGroup.Veltune-Desktop
 productName: YouTube Music
+publish:
+  - provider: github
+    owner: VeltuneGroup
+    repo: Veltune-Desktop
 files:
   - '!*'
   - dist
