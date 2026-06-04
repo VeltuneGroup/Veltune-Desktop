@@ -1,4 +1,4 @@
-appId: com.github.th-ch.youtube-music
+appId: com.github.VeltuneGroup.Veltune-Desktop
 productName: YouTube Music
 files:
   - '!*'
@@ -43,7 +43,7 @@ linux:
   category: AudioVideo
   desktop:
     entry:
-      StartupWMClass: com.github.th_ch.youtube_music
+      StartupWMClass: com.github.VeltuneGroup.Veltune_Desktop
   target:
     - target: AppImage
       arch:

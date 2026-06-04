@@ -319,12 +319,20 @@ export default createPlugin<
               }
             }
             if (permissionLevel >= 1) {
-              if (typeof event.payload?.index === 'number') {
-                const nowIndex = this.queue?.selectedIndex ?? 0;
+              const targetIndex = event.payload?.currentVideo
+                ? (this.queue?.findVideoIndex(event.payload.currentVideo) ?? -1)
+                : event.payload?.index;
 
-                if (nowIndex !== event.payload.index) {
-                  this.queue?.setIndex(event.payload.index);
+              if (typeof targetIndex === 'number' && targetIndex >= 0) {
+                const nowIndex = this.queue?.selectedIndex;
+
+                if (nowIndex !== targetIndex) {
+                  this.queue?.setIndex(targetIndex);
                 }
+              } else if (event.payload?.currentVideo) {
+                await this.connection?.broadcast('SYNC_QUEUE', {
+                  videoList: this.queue?.videoList ?? [],
+                });
               }
             }
 
@@ -370,7 +378,12 @@ export default createPlugin<
       );
       if (typeof id !== 'string') return false;
 
-      const connection = await this.connection.connect(id).catch(() => false);
+      const normalizedId = id.trim();
+      if (!normalizedId) return false;
+
+      const connection = await this.connection
+        .connect(normalizedId)
+        .catch(() => false);
       if (!connection) return false;
       this.connection.onConnections((connection) => {
         if (!connection?.open) {
@@ -477,12 +490,18 @@ export default createPlugin<
               if (event.payload?.state === 2) this.playerApi?.pauseVideo();
               if (event.payload?.state === 1) this.playerApi?.playVideo();
             }
-            if (typeof event.payload?.index === 'number') {
-              const nowIndex = this.queue?.selectedIndex ?? 0;
+            const targetIndex = event.payload?.currentVideo
+              ? (this.queue?.findVideoIndex(event.payload.currentVideo) ?? -1)
+              : event.payload?.index;
 
-              if (nowIndex !== event.payload.index) {
-                this.queue?.setIndex(event.payload.index);
+            if (typeof targetIndex === 'number' && targetIndex >= 0) {
+              const nowIndex = this.queue?.selectedIndex;
+
+              if (nowIndex !== targetIndex) {
+                this.queue?.setIndex(targetIndex);
               }
+            } else if (event.payload?.currentVideo) {
+              await this.connection?.broadcast('SYNC_QUEUE', undefined);
             }
             break;
           }
@@ -707,12 +726,14 @@ export default createPlugin<
 
       this.stateInterval = window.setInterval(() => {
         if (this.connection?.mode !== 'host') return;
-        const index = this.queue?.selectedIndex ?? 0;
+        const index = this.queue?.selectedIndex;
+        const currentVideo = this.queue?.selectedVideo;
 
         this.connection.broadcast('SYNC_PROGRESS', {
           progress: this.playerApi?.getCurrentTime(),
           state: this.playerApi?.getPlayerState(),
-          index,
+          ...(typeof index === 'number' ? { index } : undefined),
+          ...(currentVideo ? { currentVideo } : undefined),
         });
       }, 1000);
 

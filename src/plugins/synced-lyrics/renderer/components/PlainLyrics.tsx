@@ -5,13 +5,16 @@ import { config } from '../renderer';
 
 interface PlainLyricsProps {
   line: string;
+  translation?: string;
 }
 
 export const PlainLyrics = (props: PlainLyricsProps) => {
   const [romanization, setRomanization] = createSignal('');
 
   createEffect(() => {
-    if (!config()?.romanization) return;
+    if (!config()?.romanization) {
+      return;
+    }
 
     const input = canonicalize(props.line);
     romanize(input).then((result) => {
@@ -34,6 +37,14 @@ export const PlainLyrics = (props: PlainLyricsProps) => {
           runs: [{ text: props.line }],
         }}
       />
+      <Show when={config()?.showTranslation && props.translation?.trim()}>
+        <yt-formatted-string
+          class="translation"
+          text={{
+            runs: [{ text: props.translation! }],
+          }}
+        />
+      </Show>
       <Show
         when={
           config()?.romanization &&

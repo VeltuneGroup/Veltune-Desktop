@@ -16,7 +16,12 @@ export type ConnectionEventMap = {
   SYNC_PROFILE: { profiles: Record<string, Profile> } | undefined;
   SYNC_QUEUE: { videoList: VideoData[] } | undefined;
   SYNC_PROGRESS:
-    | { progress?: number; state?: number; index?: number }
+    | {
+        progress?: number;
+        state?: number;
+        index?: number;
+        currentVideo?: VideoData;
+      }
     | undefined;
   PERMISSION: Permission | undefined;
   CONNECTION_CLOSED: null;

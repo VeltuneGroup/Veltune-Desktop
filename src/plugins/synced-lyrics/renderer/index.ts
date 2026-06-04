@@ -21,12 +21,46 @@ export const renderer = createRenderer<
     observerCallback: MutationCallback;
     observer?: MutationObserver;
     videoDataChange: () => Promise<void>;
-    updateTimestampInterval?: NodeJS.Timeout | string | number;
+    syncClock: () => void;
+    options?: SyncedLyricsPluginConfig;
+    updateTimestampInterval?: number;
+    updateTimestampFrame?: number;
   },
   SyncedLyricsPluginConfig
 >({
   onConfigChange(newConfig) {
+    this.options = newConfig;
     setConfig(newConfig);
+    this.syncClock();
+  },
+
+  syncClock() {
+    if (this.updateTimestampInterval !== undefined) {
+      window.clearInterval(this.updateTimestampInterval);
+      this.updateTimestampInterval = undefined;
+    }
+
+    if (this.updateTimestampFrame !== undefined) {
+      window.cancelAnimationFrame(this.updateTimestampFrame);
+      this.updateTimestampFrame = undefined;
+    }
+
+    const updateCurrentTime = () => {
+      setCurrentTime((_ytAPI?.getCurrentTime() ?? 0) * 1000);
+    };
+
+    if (this.options?.preciseTiming) {
+      const tick = () => {
+        updateCurrentTime();
+        this.updateTimestampFrame = window.requestAnimationFrame(tick);
+      };
+
+      tick();
+      return;
+    }
+
+    updateCurrentTime();
+    this.updateTimestampInterval = window.setInterval(updateCurrentTime, 100);
   },
 
   observerCallback(mutations: MutationRecord[]) {
@@ -49,15 +83,11 @@ export const renderer = createRenderer<
 
     api.addEventListener('videodatachange', this.videoDataChange);
 
+    this.syncClock();
     await this.videoDataChange();
   },
   async videoDataChange() {
-    if (!this.updateTimestampInterval) {
-      this.updateTimestampInterval = setInterval(
-        () => setCurrentTime((_ytAPI?.getCurrentTime() ?? 0) * 1000),
-        100,
-      );
-    }
+    this.syncClock();
 
     // prettier-ignore
     this.observer ??= new MutationObserver(this.observerCallback);
@@ -77,7 +107,8 @@ export const renderer = createRenderer<
   async start(ctx: RendererContext<SyncedLyricsPluginConfig>) {
     netFetch = ctx.ipc.invoke.bind(ctx.ipc, 'synced-lyrics:fetch');
 
-    setConfig(await ctx.getConfig());
+    this.options = await ctx.getConfig();
+    setConfig(this.options);
 
     ctx.ipc.on('ytmd:update-song-info', (info: SongInfo) => {
       fetchLyrics(info);

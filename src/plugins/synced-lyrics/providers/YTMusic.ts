@@ -88,9 +88,13 @@ export class YTMusic implements LyricProvider {
     return {
       title,
       artists: [artist],
-
       lyrics: plain,
       lines: synced,
+      meta: {
+        exact: true,
+        inexact: false,
+        fallbackUsed: false,
+      },
     };
   }
 

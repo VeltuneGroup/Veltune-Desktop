@@ -1,10 +1,13 @@
-import { createEffect, For, Show, createSignal, createMemo } from 'solid-js';
+import { createEffect, createMemo, createSignal, For, Show } from 'solid-js';
 
 import { type VirtualizerHandle } from 'virtua/solid';
 
-import { type LineLyrics } from '@/plugins/synced-lyrics/types';
+import {
+  type LineLyrics,
+  type WordLyrics,
+} from '@/plugins/synced-lyrics/types';
 
-import { config, currentTime } from '../renderer';
+import { config, currentTime, effectiveOffsetMs } from '../renderer';
 import { _ytAPI } from '..';
 
 import { canonicalize, romanize, simplifyUnicode } from '../utils';
@@ -12,10 +15,35 @@ import { canonicalize, romanize, simplifyUnicode } from '../utils';
 interface SyncedLineProps {
   scroller: VirtualizerHandle;
   index: number;
-
   line: LineLyrics;
   status: 'upcoming' | 'current' | 'previous';
+  translation?: string;
 }
+
+const getWordProgress = (
+  word: WordLyrics,
+  status: SyncedLineProps['status'],
+  now: number,
+  leadMs: number,
+) => {
+  if (status === 'previous') {
+    return 1;
+  }
+
+  if (status === 'upcoming') {
+    return 0;
+  }
+
+  const lineNow = now + leadMs - effectiveOffsetMs();
+  if (word.duration <= 0) {
+    return lineNow >= word.timeInMs ? 1 : 0;
+  }
+
+  return Math.min(
+    1,
+    Math.max(0, (lineNow - word.timeInMs) / Math.max(word.duration, 1)),
+  );
+};
 
 const EmptyLine = (props: SyncedLineProps) => {
   const states = createMemo(() => {
@@ -24,12 +52,15 @@ const EmptyLine = (props: SyncedLineProps) => {
   });
 
   const index = createMemo(() => {
-    const progress = currentTime() - props.line.timeInMs;
+    const progress = currentTime() - effectiveOffsetMs() - props.line.timeInMs;
     const total = props.line.duration;
-
-    const percentage = Math.min(1, progress / total);
+    const percentage = Math.min(1, Math.max(0, progress / Math.max(total, 1)));
     return Math.max(0, Math.floor((states().length - 1) * percentage));
   });
+
+  const isInstrumentalGap = createMemo(
+    () => props.line.duration >= (config()?.gapIndicatorThresholdMs ?? 5000),
+  );
 
   return (
     <div
@@ -49,7 +80,7 @@ const EmptyLine = (props: SyncedLineProps) => {
           }}
         />
 
-        <div class="text-lyrics">
+        <div class="text-lyrics instrumental-gap">
           <span>
             <span>
               <Show
@@ -74,6 +105,9 @@ const EmptyLine = (props: SyncedLineProps) => {
               </Show>
             </span>
           </span>
+          <Show when={isInstrumentalGap()}>
+            <span class="translation">Instrumental</span>
+          </Show>
         </div>
       </div>
     </div>
@@ -82,16 +116,31 @@ const EmptyLine = (props: SyncedLineProps) => {
 
 export const SyncedLine = (props: SyncedLineProps) => {
   const text = createMemo(() => props.line.text.trim());
+  const words = createMemo(() => props.line.words ?? []);
+  const wordLeadMs = createMemo(() => (props.line.isWordSynced ? 90 : 140));
+  const lineProgress = createMemo(() => {
+    const now =
+      currentTime() + Math.min(wordLeadMs(), 90) - effectiveOffsetMs();
+    const progress = now - props.line.timeInMs;
+    return Math.min(
+      1,
+      Math.max(0, progress / Math.max(props.line.duration, 1)),
+    );
+  });
 
   const [romanization, setRomanization] = createSignal('');
   createEffect(() => {
     const input = canonicalize(text());
-    if (!config()?.romanization) return;
+    if (!config()?.romanization) {
+      return;
+    }
 
     romanize(input).then((result) => {
       setRomanization(canonicalize(result));
     });
   });
+
+  const translatedLine = createMemo(() => props.translation?.trim() ?? '');
 
   return (
     <Show fallback={<EmptyLine {...props} />} when={text()}>
@@ -115,35 +164,40 @@ export const SyncedLine = (props: SyncedLineProps) => {
           <div
             class="text-lyrics"
             ref={(div: HTMLDivElement) => {
-              // TODO: Investigate the animation, even though the duration is properly set, all lines have the same animation duration
               div.style.setProperty(
                 '--lyrics-duration',
                 `${props.line.duration / 1000}s`,
                 'important',
               );
             }}
-            style={{ 'display': 'flex', 'flex-direction': 'column' }}
+            style={{
+              'display': 'flex',
+              'flex-direction': 'column',
+              '--line-progress': `${lineProgress()}`,
+            }}
           >
-            <span>
-              <For each={text().split(' ')}>
-                {(word, index) => {
-                  return (
-                    <span
-                      style={{
-                        'transition-delay': `${index() * 0.05}s`,
-                        'animation-delay': `${index() * 0.05}s`,
+            <span class="word-line">
+              <For each={words()}>
+                {(word) => (
+                  <span
+                    class="lyric-word"
+                    style={{
+                      '--word-progress': `${getWordProgress(word, props.status, currentTime(), wordLeadMs())}`,
+                    }}
+                  >
+                    <yt-formatted-string
+                      text={{
+                        runs: [{ text: word.text }],
                       }}
-                    >
-                      <yt-formatted-string
-                        text={{
-                          runs: [{ text: `${word} ` }],
-                        }}
-                      />
-                    </span>
-                  );
-                }}
+                    />
+                  </span>
+                )}
               </For>
             </span>
+
+            <Show when={config()?.showTranslation && translatedLine()}>
+              <span class="translation">{translatedLine()}</span>
+            </Show>
 
             <Show
               when={
@@ -156,9 +210,15 @@ export const SyncedLine = (props: SyncedLineProps) => {
                   {(word, index) => {
                     return (
                       <span
+                        class="lyric-word"
                         style={{
-                          'transition-delay': `${index() * 0.05}s`,
-                          'animation-delay': `${index() * 0.05}s`,
+                          '--word-progress': `${
+                            props.status === 'previous'
+                              ? 1
+                              : props.status === 'current'
+                                ? Math.min(1, lineProgress() + index() * 0.03)
+                                : 0
+                          }`,
                         }}
                       >
                         <yt-formatted-string

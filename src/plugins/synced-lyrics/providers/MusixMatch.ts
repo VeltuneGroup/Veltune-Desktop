@@ -48,6 +48,15 @@ export class MusixMatch implements LyricProvider {
           }))
         : undefined,
       lyrics: lyrics,
+      meta: {
+        exact:
+          track.track_name.toLowerCase() ===
+          (info.alternativeTitle || info.title).toLowerCase(),
+        inexact:
+          track.track_name.toLowerCase() !==
+          (info.alternativeTitle || info.title).toLowerCase(),
+        fallbackUsed: false,
+      },
     };
   }
 }

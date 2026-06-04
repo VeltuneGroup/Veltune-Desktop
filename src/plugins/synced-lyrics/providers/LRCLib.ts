@@ -39,12 +39,14 @@ export class LRCLib implements LyricProvider {
       throw new Error(`Expected an array, instead got ${typeof data}`);
     }
 
+    let usedFallbackQuery = false;
+
     if (data.length === 0) {
       if (!config()?.showLyricsEvenIfInexact) {
         return null;
       }
 
-      // Try to search with the alternative title (original language)
+      usedFallbackQuery = true;
       const trackName = alternativeTitle || title;
       query = new URLSearchParams({ q: `${trackName}` });
       url = `${this.baseUrl}/api/search?${query.toString()}`;
@@ -171,6 +173,14 @@ export class LRCLib implements LyricProvider {
           }))
         : undefined,
       lyrics: plain,
+      meta: {
+        durationDeltaMs: Math.round(
+          (closestResult.duration - songDuration) * 1000,
+        ),
+        exact: !usedFallbackQuery,
+        inexact: usedFallbackQuery,
+        fallbackUsed: usedFallbackQuery,
+      },
     };
   }
 }

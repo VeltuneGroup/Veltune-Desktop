@@ -131,7 +131,7 @@ if (config.get('options.disableHardwareAcceleration')) {
 
 if (is.linux()) {
   // Overrides WM_CLASS for X11 to correspond to icon filename
-  app.setName('com.github.th_ch.youtube_music');
+  app.setName('com.github.VeltuneGroup.Veltune_Desktop');
 
   // Stops chromium from launching its own MPRIS service
   if (await config.plugins.isEnabled('shortcuts')) {
@@ -660,7 +660,7 @@ app.whenReady().then(async () => {
 
   // Register appID on windows
   if (is.windows()) {
-    const appID = 'com.github.th-ch.youtube-music';
+    const appID = 'com.github.VeltuneGroup.Veltune-Desktop';
     app.setAppUserModelId(appID);
     const appLocation = process.execPath;
     const appData = app.getPath('appData');

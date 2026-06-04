@@ -31,6 +31,11 @@ export class Boidu implements LyricProvider {
       title,
       artists: [artist],
       lines,
+      meta: {
+        exact: false,
+        inexact: true,
+        fallbackUsed: false,
+      },
     };
   }
 }

@@ -141,12 +141,17 @@ export class Queue {
   }
 
   get selectedIndex() {
-    return (
-      mapQueueItem(
-        (it) => it?.selected,
-        this.queue.queue.store.store.getState().queue.items,
-      ).findIndex(Boolean) ?? 0
-    );
+    const index = mapQueueItem(
+      (it) => it?.selected,
+      this.queue.queue.store.store.getState().queue.items,
+    ).findIndex(Boolean);
+
+    return index >= 0 ? index : undefined;
+  }
+
+  get selectedVideo() {
+    const index = this.selectedIndex;
+    return typeof index === 'number' ? this._videoList[index] : undefined;
   }
 
   get rawItems() {
@@ -242,12 +247,28 @@ export class Queue {
   }
 
   setIndex(index: number) {
+    if (!Number.isInteger(index)) return false;
+    if (index < 0 || index >= this._videoList.length) return false;
+
     this.internalDispatch = true;
     this.queue?.dispatch({
       type: 'SET_INDEX',
       payload: index,
     });
     this.internalDispatch = false;
+    return true;
+  }
+
+  findVideoIndex(video?: VideoData) {
+    if (!video) return -1;
+
+    const exactIndex = this._videoList.findIndex(
+      (item) =>
+        item.videoId === video.videoId && item.ownerId === video.ownerId,
+    );
+    if (exactIndex >= 0) return exactIndex;
+
+    return this._videoList.findIndex((item) => item.videoId === video.videoId);
   }
 
   moveItem(fromIndex: number, toIndex: number) {
@@ -350,6 +371,7 @@ export class Queue {
                     type: 'SYNC_PROGRESS',
                     payload: {
                       index,
+                      currentVideo: this._videoList[index],
                     },
                   },
                 ],
@@ -436,10 +458,12 @@ export class Queue {
           return;
         }
         if (event.type === 'SET_INDEX') {
+          const index = event.payload as number;
           this.broadcast({
             type: 'SYNC_PROGRESS',
             payload: {
-              index: event.payload as number,
+              index,
+              currentVideo: this._videoList[index],
             },
           });
           return;
