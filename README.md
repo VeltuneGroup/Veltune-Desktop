@@ -141,17 +141,11 @@ Download builds from the [latest release](https://github.com/VeltuneGroup/Veltun
 
 At the moment, this fork only documents direct GitHub releases. Old package-manager instructions from the original project were removed because they may no longer point to maintained packages for this fork.
 
+Right now the README focuses on Windows distribution. Broader support for other operating systems is planned for the future as the fork matures.
+
 ### Windows
 
 Microsoft Defender SmartScreen may still warn that the app is from an unknown publisher until builds are code-signed.
-
-### macOS
-
-If macOS says the app is damaged or can’t be opened after a manual install, run:
-
-```bash
-/usr/bin/xattr -cr /Applications/YouTube\ Music.app
-```
 
 ## Themes
 
