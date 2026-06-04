@@ -1,0 +1,25 @@
+packages:
+  - '.'
+
+overrides:
+  vite: 'npm:rolldown-vite@7.1.5'
+  node-gyp: '11.4.2'
+  xml2js: '0.6.2'
+  node-fetch: '3.3.2'
+  '@electron/universal': '3.0.1'
+  '@babel/runtime': '7.28.4'
+
+patchedDependencies:
+  vudio@2.1.1: patches/vudio@2.1.1.patch
+  '@malept/flatpak-bundler@0.4.0': patches/@malept__flatpak-bundler@0.4.0.patch
+  kuromoji@0.1.2: patches/kuromoji@0.1.2.patch
+  file-type@16.5.4: patches/file-type@16.5.4.patch
+  electron-is@3.0.0: patches/electron-is@3.0.0.patch
+
+allowBuilds:
+  bufferutil: true
+  electron-winstaller: true
+  electron: true
+  esbuild: true
+  unrs-resolver: true
+  utf-8-validate: true
