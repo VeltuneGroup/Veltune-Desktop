@@ -16,9 +16,7 @@
 
 
 
-Veltune Desktop is a community-maintained fork of the original YouTube Music desktop app.
-It keeps the Electron wrapper and plugin system while continuing development, fixes, and maintenance.
-
+Veltune Desktop is a community-driven continuation of Pear Desktop, the original YouTube Music desktop client. It focuses on stability, active maintenance, and ongoing improvements while preserving its plugin-based architecture.
 
 
 ## Contents
