@@ -86,7 +86,7 @@
     "filenamify": "6.0.0",
     "hanja": "1.1.5",
     "happy-dom": "18.0.1",
-    "hono": "4.12.21",
+    "hono": "4.9.6",
     "howler": "2.2.4",
     "html-to-text": "9.0.5",
     "i18next": "25.5.2",
@@ -157,7 +157,7 @@
     "vite-plugin-inspect": "11.3.3",
     "vite-plugin-resolve": "2.5.2",
     "vite-plugin-solid": "2.11.8",
-    "ws": "8.20.1"
+    "ws": "8.18.3"
   },
   "auto-changelog": {
     "hideCredit": true,
