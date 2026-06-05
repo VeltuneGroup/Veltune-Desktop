@@ -2,8 +2,7 @@
 
 # Veltune Desktop
 
-> ⚠️ Veltune Desktop is actively developed and may change frequently. Expect occasional bugs in early releases.
-
+> ⚠️ Actively developed fork of Pear Desktop — expect frequent updates and occasional instability in early releases.
 
 [![GitHub release](https://img.shields.io/github/release/VeltuneGroup/Veltune-Desktop.svg?style=for-the-badge&logo=github)](https://github.com/VeltuneGroup/Veltune-Desktop/releases/)
 [![GitHub license](https://img.shields.io/github/license/VeltuneGroup/Veltune-Desktop.svg?style=for-the-badge)](https://github.com/VeltuneGroup/Veltune-Desktop/blob/main/license)
@@ -14,307 +13,202 @@
 
 ![Screenshot](web/screenshot.png "Screenshot")
 
+## Overview
 
+Veltune Desktop is a maintained fork of Pear Desktop, a YouTube Music desktop client. It focuses on stability, bug fixes, and ongoing community-driven development while preserving the original plugin-based architecture.
 
-Veltune Desktop is a community-maintained fork of the original YouTube Music desktop app.
-It keeps the Electron wrapper and plugin system while continuing development, fixes, and maintenance.
+## Why this exists
 
-
-
-## Contents
-
-- [Features](#features)
-- [Available plugins](#available-plugins)
-- [Download](#download)
-- [Themes](#themes)
-- [Development](#development)
-- [Build your own plugins](#build-your-own-plugins)
-  - [Creating a plugin](#creating-a-plugin)
-  - [Common use cases](#common-use-cases)
-- [Build](#build)
-- [Production Preview](#production-preview)
-- [Tests](#tests)
-- [License](#license)
-- [FAQ](#faq)
+Pear Desktop is no longer actively maintained, and many issues remain unresolved. Veltune Desktop continues its development to keep the project usable by providing fixes, improvements, and long-term maintenance.
 
 ## Features
 
-- Native desktop wrapper for YouTube Music
-- Plugin system for UI tweaks, quality-of-life improvements, and extra integrations
-- Built-in settings for enabling, disabling, and configuring plugins
-- Ongoing community maintenance in this fork
+- Native desktop YouTube Music client
+- Plugin-based extension system
+- Built-in plugin manager (enable / disable / configure)
+- Lightweight Electron-based architecture
+- Actively maintained fork with ongoing updates
 
-## Available plugins:
+## Plugins
 
-- **Ad Blocker**: Block all ads and tracking out of the box
+Veltune Desktop includes a powerful plugin system for extending functionality.
 
-- **Album Actions**: Adds Undislike, Dislike, Like, and Unlike buttons to apply this to all songs in a playlist or album
+Included plugins:
 
-- **Album Color Theme**: Applies a dynamic theme and visual effects based on the album color palette
-
-- **Ambient Mode**: Applies a lighting effect by casting gentle colors from the video, into your screen’s background
-
-- **Audio Compressor**: Apply compression to audio (lowers the volume of the loudest parts of the signal and raises the
-  volume of the softest parts)
-
-- **Blur Navigation Bar**: makes navigation bar transparent and blurry
-
-- **Captions Selector**: Enable captions
-
-- **Compact Sidebar**: Always set the sidebar in compact mode
-
-- **Crossfade**: Crossfade between songs
-
-- **Disable Autoplay**: Makes every song start in "paused" mode
-
-- **[Discord](https://discord.com/) Rich Presence**: Show your friends what you listen to
-  with [Rich Presence](https://user-images.githubusercontent.com/28219076/104362104-a7a0b980-5513-11eb-9744-bb89eabe0016.png)
-
-- **Downloader**: downloads
-  MP3 [directly from the interface](https://user-images.githubusercontent.com/61631665/129977677-83a7d067-c192-45e1-98ae-b5a4927393be.png) [(youtube-dl)](https://github.com/ytdl-org/youtube-dl)
-
-- **Equalizer**: add filters to boost or cut specific range of frequencies (e.g. bass booster)
-
-- **Exponential Volume**: Makes the volume
-  slider [exponential](https://greasyfork.org/en/scripts/397686-youtube-music-fix-volume-ratio/) so it's easier to
-  select lower volumes
-
-- **In-App Menu**: gives bars a fancy, dark look
-
-- **Scrobbler**: Adds scrobbling support for [Last.fm](https://www.last.fm/) and [ListenBrainz](https://listenbrainz.org/)
-
-- **Lumia Stream**: Adds [Lumia Stream](https://lumiastream.com/) support
-
-- **Lyrics Genius**: Adds lyrics support for most songs
-
-- **Music Together**: Share a playlist with others. When the host plays a song, everyone else will hear the same song
-
-- **Navigation**: Next/Back navigation arrows directly integrated in the interface, like in your favorite browser
-
-- **No Google Login**: Remove Google login buttons and links from the interface
-
-- **Notifications**: Display a notification when a song starts
-  playing ([interactive notifications](https://user-images.githubusercontent.com/78568641/114102651-63ce0e00-98d0-11eb-9dfe-c5a02bb54f9c.png)
-  are available on windows)
-
-- **Picture-in-picture**: allows to switch the app to picture-in-picture mode
-
-- **Playback Speed**: Listen fast, listen
-  slow! [Adds a slider that controls song speed](https://user-images.githubusercontent.com/61631665/129976003-e55db5ba-bf42-448c-a059-26a009775e68.png)
-
-- **Precise Volume**: Control the volume precisely using mousewheel/hotkeys, with a custom hud and customizable volume
-  steps
-
-- **Shortcuts (& MPRIS)**: Allows setting global hotkeys for playback (play/pause/next/previous), overriding media keys, enabling Ctrl/CMD + F to search, Linux MPRIS support, and custom hotkeys for advanced users
-
-- **Skip Disliked Song**: Skips disliked songs
-
-- **Skip Silences**: Automatically skip silenced sections
-
-- [**SponsorBlock**](https://github.com/ajayyy/SponsorBlock): Automatically Skips non-music parts like intro/outro or
-  parts of music videos where the song isn't playing
-
-- **Synced Lyrics**: Provides synced lyrics to songs, using providers like [LRClib](https://lrclib.net).
-
-- **Taskbar Media Control**: Control playback from
-  your [Windows taskbar](https://user-images.githubusercontent.com/78568641/111916130-24a35e80-8a82-11eb-80c8-5021c1aa27f4.png)
-
-- **TouchBar**: Custom TouchBar layout for macOS
-
-- **Tuna OBS**: Integration with [OBS](https://obsproject.com/)'s
-  plugin [Tuna](https://obsproject.com/forum/resources/tuna.843/)
-
-- **Unobtrusive Player**: Prevents the player from popping up when playing a song
-
-- **Video Quality Changer**: Allows changing the video quality with
-  a [button](https://user-images.githubusercontent.com/78568641/138574366-70324a5e-2d64-4f6a-acdd-dc2a2b9cecc5.png) on
-  the video overlay
-
-- **Video Toggle**: Adds
-  a [button](https://user-images.githubusercontent.com/28893833/173663950-63e6610e-a532-49b7-9afa-54cb57ddfc15.png) to
-  switch between Video/Song mode. can also optionally remove the whole video tab
-
-- **Visualizer**: Different music visualizers
-
-
-## Download
-
-Download builds from the [latest release](https://github.com/VeltuneGroup/Veltune-Desktop/releases/latest).
-
-At the moment, this fork only documents direct GitHub releases. Old package-manager instructions from the original project were removed because they may no longer point to maintained packages for this fork.
-
-Right now the README focuses on Windows distribution. Broader support for other operating systems is planned for the future as the fork matures.
-
-### Windows
-
-Microsoft Defender SmartScreen may still warn that the app is from an unknown publisher until builds are code-signed.
+- **Ad Blocker** – Removes ads and tracking
+- **Album Actions** – Apply like/dislike actions across albums
+- **Album Color Theme** – Dynamic UI based on album art
+- **Ambient Mode** – Screen lighting effects from video colors
+- **Audio Compressor** – Adjust audio dynamic range
+- **Blur Navigation Bar** – Transparent blurred UI navigation
+- **Captions Selector** – Manage subtitles and captions
+- **Compact Sidebar** – Forces compact layout
+- **Crossfade** – Smooth transitions between songs
+- **Disable Autoplay** – Stops automatic playback
+- **Discord Rich Presence** – Show listening status on Discord
+- **Downloader** – Download audio via interface (youtube-dl)
+- **Equalizer** – Audio frequency control
+- **Exponential Volume** – Improved low-volume control
+- **In-App Menu** – Custom styled application menu
+- **Scrobbler** – Last.fm / ListenBrainz support
+- **Lumia Stream** – Lumia Stream integration
+- **Lyrics Genius** – Lyrics support
+- **Music Together** – Synchronized listening sessions
+- **Navigation Controls** – Back/forward navigation
+- **No Google Login** – Removes login UI elements
+- **Notifications** – Playback notifications
+- **Picture-in-Picture** – Floating mini player
+- **Playback Speed** – Adjust playback speed
+- **Precise Volume** – Fine volume control
+- **Shortcuts & MPRIS** – Hotkeys + Linux media support
+- **Skip Disliked Song** – Auto-skip disliked tracks
+- **Skip Silences** – Skip silent segments
+- **SponsorBlock** – Skip non-music segments
+- **Synced Lyrics** – Real-time lyrics sync
+- **Taskbar Media Control** – Windows taskbar controls
+- **TouchBar** – macOS TouchBar support
+- **Tuna OBS** – OBS integration
+- **Unobtrusive Player** – Prevents unwanted popups
+- **Video Quality Changer** – Manual quality selection
+- **Video Toggle** – Switch video/audio modes
+- **Visualizer** – Audio visual effects
 
 ## Themes
 
-You can load CSS files to change the look of the application (Options > Visual Tweaks > Themes).
+You can customize the UI using CSS themes.
 
-Some predefined themes are available in https://github.com/kerichdev/themes-for-ytmdesktop-player.
+Options → Visual Tweaks → Themes
+
+Prebuilt themes:
+https://github.com/kerichdev/themes-for-ytmdesktop-player
 
 ## Development
 
-```bash
 git clone https://github.com/VeltuneGroup/Veltune-Desktop
 cd Veltune-Desktop
 pnpm install --frozen-lockfile
 pnpm dev
-```
 
-## Build your own plugins
+## Build
 
-Using plugins, you can:
+pnpm dist:win
 
-- manipulate the app - the `BrowserWindow` from electron is passed to the plugin handler
-- change the front by manipulating the HTML/CSS
+## Production Preview
 
-### Creating a plugin
+pnpm start
 
-Create a folder in `src/plugins/YOUR-PLUGIN-NAME`:
+## Testing
 
-- `index.ts`: the main file of the plugin
-```typescript
-import style from './style.css?inline'; // import style as inline
+pnpm test
 
+Powered by Playwright.
+
+## Plugin Development
+
+Plugins allow you to extend Veltune Desktop functionality.
+
+They can:
+- Modify the Electron window
+- Inject UI / CSS
+- Communicate between backend and renderer
+- Extend player behavior
+
+### Creating a Plugin
+
+Create a folder:
+
+src/plugins/YOUR-PLUGIN-NAME
+
+Add:
+
+index.ts – main plugin file
+
+Example:
+
+import style from './style.css?inline';
 import { createPlugin } from '@/utils';
 
 export default createPlugin({
   name: 'Plugin Label',
-  restartNeeded: true, // if value is true, ytmusic show restart dialog
+  restartNeeded: true,
+
   config: {
     enabled: false,
-  }, // your custom config
-  stylesheets: [style], // your custom style,
-  menu: async ({ getConfig, setConfig }) => {
-    // All *Config methods are wrapped Promise<T>
-    const config = await getConfig();
-    return [
-      {
-        label: 'menu',
-        submenu: [1, 2, 3].map((value) => ({
-          label: `value ${value}`,
-          type: 'radio',
-          checked: config.value === value,
-          click() {
-            setConfig({ value });
-          },
-        })),
-      },
-    ];
   },
+
+  stylesheets: [style],
+
   backend: {
     start({ window, ipc }) {
       window.maximize();
 
-      // you can communicate with renderer plugin
       ipc.handle('some-event', () => {
         return 'hello';
       });
     },
-    // it fired when config changed
-    onConfigChange(newConfig) { /* ... */ },
-    // it fired when plugin disabled
-    stop(context) { /* ... */ },
+
+    onConfigChange() {},
+    stop() {},
   },
+
   renderer: {
     async start(context) {
       console.log(await context.ipc.invoke('some-event'));
     },
-    // Only renderer available hook
-    onPlayerApiReady(api: YoutubePlayer, context: RendererContext) {
-      // set plugin config easily
-      context.setConfig({ myConfig: api.getVolume() });
+
+    onPlayerApiReady(api, context) {
+      context.setConfig({ volume: api.getVolume() });
     },
-    onConfigChange(newConfig) { /* ... */ },
-    stop(_context) { /* ... */ },
+
+    onConfigChange() {},
+    stop() {},
   },
+
   preload: {
     async start({ getConfig }) {
-      const config = await getConfig();
+      await getConfig();
     },
-    onConfigChange(newConfig) {},
-    stop(_context) {},
+
+    onConfigChange() {},
+    stop() {},
   },
 });
-```
 
-### Common use cases
+### Example: Inject CSS
 
-- injecting custom CSS: create a `style.css` file in the same folder then:
-
-```typescript
-// index.ts
-import style from './style.css?inline'; // import style as inline
-
+import style from './style.css?inline';
 import { createPlugin } from '@/utils';
 
 export default createPlugin({
   name: 'Plugin Label',
-  restartNeeded: true, // if value is true, ytmusic will show a restart dialog
-  config: {
-    enabled: false,
-  }, // your custom config
-  stylesheets: [style], // your custom style
-  renderer() {} // define renderer hook
+  restartNeeded: true,
+  config: { enabled: false },
+  stylesheets: [style],
+  renderer() {},
 });
-```
 
-- If you want to change the HTML:
+### Example: Modify UI
 
-```typescript
 import { createPlugin } from '@/utils';
 
 export default createPlugin({
   name: 'Plugin Label',
-  restartNeeded: true, // if value is true, ytmusic will show the restart dialog
-  config: {
-    enabled: false,
-  }, // your custom config
+  restartNeeded: true,
+  config: { enabled: false },
+
   renderer() {
-    // Remove the login button
-    document.querySelector(".sign-in-link.ytmusic-nav-bar").remove();
-  } // define renderer hook
+    document.querySelector(".sign-in-link.ytmusic-nav-bar")?.remove();
+  },
 });
-```
-
-- communicating between the front and back: can be done using the ipcMain module from electron. See `index.ts` file and
-  example in `sponsorblock` plugin.
-
-## Build
-
-1. Clone the repo
-2. Follow [this guide](https://pnpm.io/installation) to install `pnpm`
-3. Run `pnpm install --frozen-lockfile` to install dependencies
-4. Run the build command for the platform currently supported by this fork
-
-- `pnpm dist:win` - Windows
-
-Additional platform targets may return later as support for this fork expands.
-
-## Production Preview
-
-```bash
-pnpm start
-```
-
-## Tests
-
-```bash
-pnpm test
-```
-
-Uses [Playwright](https://playwright.dev/) to test the app.
 
 ## License
 
-MIT — see [`license`](./license)
+MIT — see license
 
 ## FAQ
 
-### Why apps menu isn't showing up?
+Why is the menu not showing?
 
-If `Hide Menu` option is on - you can show the menu with the <kbd>alt</kbd> key (or <kbd>\`</kbd> [backtick] if using
-the in-app-menu plugin)
+If “Hide Menu” is enabled:
+- Press Alt (Windows)
+- Or ` (backtick) if using in-app menu mode
