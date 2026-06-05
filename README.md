@@ -2,6 +2,9 @@
 
 # Veltune Desktop
 
+> ⚠️ Veltune Desktop is actively developed and may change frequently. Expect occasional bugs in early releases.
+
+
 [![GitHub release](https://img.shields.io/github/release/VeltuneGroup/Veltune-Desktop.svg?style=for-the-badge&logo=github)](https://github.com/VeltuneGroup/Veltune-Desktop/releases/)
 [![GitHub license](https://img.shields.io/github/license/VeltuneGroup/Veltune-Desktop.svg?style=for-the-badge)](https://github.com/VeltuneGroup/Veltune-Desktop/blob/main/license)
 [![GitHub downloads](https://img.shields.io/github/downloads/VeltuneGroup/Veltune-Desktop/total?style=for-the-badge&logo=github)](https://github.com/VeltuneGroup/Veltune-Desktop/releases/)
