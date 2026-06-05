@@ -13,6 +13,7 @@
     "email": "ColdDarkHusky@users.noreply.github.com",
     "url": "https://github.com/VeltuneGroup/Veltune-Desktop"
   },
+
   "scripts": {
     "test": "pnpm playwright test",
     "test:debug": "pnpm cross-env DEBUG=pw:*,-pw:test:protocol playwright test",
@@ -39,10 +40,12 @@
     "release:win": "pnpm clean && pnpm build && pnpm electron-builder --win -p always",
     "typecheck": "pnpm tsc -p tsconfig.json --noEmit"
   },
+
   "engines": {
     "node": ">=22",
     "pnpm": ">=10"
   },
+
   "dependencies": {
     "@dehoist/romanize-thai": "1.0.0",
     "@electron-toolkit/tsconfig": "1.0.1",
@@ -87,8 +90,6 @@
     "hanja": "1.1.5",
     "happy-dom": "20.8.9",
     "hono": "4.9.6",
-    "happy-dom": "18.0.1",
-    "hono": "4.9.6",
     "howler": "2.2.4",
     "html-to-text": "9.0.5",
     "i18next": "25.5.2",
@@ -119,6 +120,7 @@
     "youtubei.js": "15.0.1",
     "zod": "4.1.5"
   },
+
   "devDependencies": {
     "@electron-toolkit/tsconfig": "1.0.1",
     "@eslint/js": "9.35.0",
@@ -160,11 +162,5 @@
     "vite-plugin-resolve": "2.5.2",
     "vite-plugin-solid": "2.11.8",
     "ws": "8.18.3"
-  },
-  "auto-changelog": {
-    "hideCredit": true,
-    "package": true,
-    "unreleased": true,
-    "output": "changelog.md"
   }
 }
