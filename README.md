@@ -137,15 +137,19 @@ Veltune Desktop is a community-driven continuation of Pear Desktop, the original
 
 ## Download
 
-Download builds from the [latest release](https://github.com/VeltuneGroup/Veltune-Desktop/releases/latest).
-
-At the moment, this fork only documents direct GitHub releases. Old package-manager instructions from the original project were removed because they may no longer point to maintained packages for this fork.
-
-Right now the README focuses on Windows distribution. Broader support for other operating systems is planned for the future as the fork matures.
+Download builds for your respective platform from the [latest release](https://github.com/VeltuneGroup/Veltune-Desktop/releases/latest).
 
 ### Windows
 
 Microsoft Defender SmartScreen may still warn that the app is from an unknown publisher until builds are code-signed.
+
+### macOS
+
+If you encounter an "unidentified developer" warning on initial launch, you may need to right-click the app and select **Open**, or allow it via your system's **Privacy & Security** settings.
+
+### Linux
+
+Download the preferred format for your distribution (AppImage, deb, or rpm). For AppImages, ensure you grant execution permissions (`chmod +x`) before running.
 
 ## Themes
 
@@ -156,7 +160,7 @@ Some predefined themes are available in https://github.com/kerichdev/themes-for-
 ## Development
 
 ```bash
-git clone https://github.com/VeltuneGroup/Veltune-Desktop
+git clone [https://github.com/VeltuneGroup/Veltune-Desktop](https://github.com/VeltuneGroup/Veltune-Desktop)
 cd Veltune-Desktop
 pnpm install --frozen-lockfile
 pnpm dev
@@ -286,11 +290,11 @@ export default createPlugin({
 1. Clone the repo
 2. Follow [this guide](https://pnpm.io/installation) to install `pnpm`
 3. Run `pnpm install --frozen-lockfile` to install dependencies
-4. Run the build command for the platform currently supported by this fork
+4. Run the build command corresponding to your operating system:
 
 - `pnpm dist:win` - Windows
-
-Additional platform targets may return later as support for this fork expands.
+- `pnpm dist:mac` - macOS
+- `pnpm dist:linux` - Linux
 
 ## Production Preview
 
@@ -316,3 +320,4 @@ MIT — see [`license`](./license)
 
 If `Hide Menu` option is on - you can show the menu with the <kbd>alt</kbd> key (or <kbd>\`</kbd> [backtick] if using
 the in-app-menu plugin)
+```
