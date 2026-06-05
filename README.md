@@ -56,8 +56,6 @@ It keeps the Electron wrapper and plugin system while continuing development, fi
 
 - **Blur Navigation Bar**: makes navigation bar transparent and blurry
 
-- **Bypass Age Restrictions**: bypass YouTube's age verification
-
 - **Captions Selector**: Enable captions
 
 - **Compact Sidebar**: Always set the sidebar in compact mode
