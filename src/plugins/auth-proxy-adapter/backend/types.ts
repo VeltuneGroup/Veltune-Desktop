@@ -1,4 +1,4 @@
-import type net from 'net';
+import type net from 'node:net';
 import type { AuthProxyConfig } from '../config';
 import type { Server } from 'http';
 

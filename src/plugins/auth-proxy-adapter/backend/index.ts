@@ -63,7 +63,7 @@ export const backend = createBackend<BackendType, AuthProxyConfig>({
       socket.once('data', (chunk) => {
         if (chunk[0] === 0x05) {
           // SOCKS5
-          this.handleSocks5(socket, chunk, upstreamProxyUrl);
+          this.handleSocks5(socket, chunk as Buffer, upstreamProxyUrl);
         } else {
           socket.end();
         }
@@ -113,7 +113,7 @@ export const backend = createBackend<BackendType, AuthProxyConfig>({
 
       // Wait for client's connection request
       clientSocket.once('data', (data) => {
-        this.processSocks5Request(clientSocket, data, upstreamProxyUrl);
+        this.processSocks5Request(clientSocket, data as Buffer, upstreamProxyUrl);
       });
     } else {
       // Authentication methods not supported by the client
