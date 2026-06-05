@@ -22,6 +22,34 @@ const [downloadButtonText, setDownloadButtonText] = createSignal<string>('');
 
 let buttonContainer: HTMLDivElement | null = null;
 
+const normalizeVideoUrl = (href?: string | null) => {
+  if (!href) {
+    return undefined;
+  }
+
+  const normalizedHref = href.startsWith('podcast/')
+    ? `watch?v=${href.slice('podcast/'.length)}`
+    : href;
+
+  try {
+    return new URL(normalizedHref, `${defaultConfig.url}/`).toString();
+  } catch {
+    return undefined;
+  }
+};
+
+const isPlaylistUrl = (url: string) => {
+  try {
+    const parsedUrl = new URL(url, `${defaultConfig.url}/`);
+    return Boolean(
+      parsedUrl.searchParams.get('list') ||
+        parsedUrl.searchParams.get('playlist'),
+    );
+  } catch {
+    return false;
+  }
+};
+
 const menuObserver = new MutationObserver(() => {
   const menu = getSongMenu();
 
@@ -60,22 +88,15 @@ export const onRendererLoad = ({
       }
     }
 
+    videoUrl = normalizeVideoUrl(videoUrl);
+
     if (videoUrl) {
-      if (videoUrl.startsWith('watch?')) {
-        videoUrl = defaultConfig.url + '/' + videoUrl;
-      }
-
-      if (videoUrl.startsWith('podcast/')) {
-        videoUrl =
-          defaultConfig.url + '/watch?' + videoUrl.replace('podcast/', 'v=');
-      }
-
-      if (videoUrl.includes('?playlist=')) {
+      if (isPlaylistUrl(videoUrl)) {
         ipc.invoke('download-playlist-request', videoUrl);
         return;
       }
     } else {
-      videoUrl = getSongInfo().url || window.location.href;
+      videoUrl = normalizeVideoUrl(getSongInfo().url) || window.location.href;
     }
 
     ipc.invoke('download-song', videoUrl);
@@ -106,8 +127,12 @@ export const onPlayerApiReady = () => {
     buttonContainer,
   );
 
-  menuObserver.observe(document.querySelector('ytmusic-popup-container')!, {
-    childList: true,
-    subtree: true,
-  });
+  menuObserver.disconnect();
+  menuObserver.observe(
+    document.querySelector('ytmusic-popup-container') ?? document.body,
+    {
+      childList: true,
+      subtree: true,
+    },
+  );
 };

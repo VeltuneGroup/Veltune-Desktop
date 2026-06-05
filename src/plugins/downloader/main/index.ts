@@ -379,14 +379,11 @@ async function downloadSongUnsafe(
   }
 
   const selectedPreset = config.selectedPreset ?? 'mp3 (256kbps)';
-  let presetSetting: Preset;
-  if (selectedPreset === 'Custom') {
-    presetSetting = config.customPresetSetting ?? DefaultPresetList['Custom'];
-  } else if (selectedPreset === 'Source') {
-    presetSetting = DefaultPresetList['Source'];
-  } else {
-    presetSetting = DefaultPresetList['mp3 (256kbps)'];
-  }
+  const presetSetting: Preset =
+    selectedPreset === 'Custom'
+      ? (config.customPresetSetting ?? DefaultPresetList['Custom'])
+      : (DefaultPresetList[selectedPreset] ??
+        DefaultPresetList['mp3 (256kbps)']);
 
   const downloadOptions: FormatOptions = {
     type: (await isYouTubeMusicPremium()) ? 'audio' : 'video+audio', // Audio, video or video+audio
@@ -611,13 +608,15 @@ async function writeID3(
 
 export async function downloadPlaylist(givenUrl?: string | URL) {
   try {
-    givenUrl = new URL(givenUrl ?? '');
+    givenUrl = new URL(givenUrl ?? '', 'https://music.youtube.com');
   } catch {
     givenUrl = new URL(win.webContents.getURL());
   }
 
-  const playlistId =
-    getPlaylistID(givenUrl) || getPlaylistID(new URL(playingUrl));
+  const fallbackPlaylistId = playingUrl
+    ? getPlaylistID(new URL(playingUrl, 'https://music.youtube.com'))
+    : undefined;
+  const playlistId = getPlaylistID(givenUrl) || fallbackPlaylistId;
 
   if (!playlistId) {
     sendError(
@@ -701,7 +700,7 @@ export async function downloadPlaylist(givenUrl?: string | URL) {
     safePlaylistTitle = safePlaylistTitle.normalize('NFC');
   }
 
-  const folder = getFolder(config.downloadFolder ?? '');
+  const folder = getFolder(config.downloadFolder);
   const playlistFolder = join(folder, safePlaylistTitle);
   if (existsSync(playlistFolder)) {
     if (!config.skipExisting) {
@@ -828,7 +827,15 @@ const getPlaylistID = (aURL?: URL): string | null | undefined => {
 };
 
 const getVideoId = (url: URL | string): string | null => {
-  return new URL(url).searchParams.get('v');
+  const parsedUrl =
+    url instanceof URL ? url : new URL(url, 'https://music.youtube.com');
+
+  return (
+    parsedUrl.searchParams.get('v') ||
+    (parsedUrl.pathname.startsWith('/podcast/')
+      ? (parsedUrl.pathname.split('/').at(-1) ?? null)
+      : null)
+  );
 };
 
 const getMetadata = (info: TrackInfo): CustomSongInfo => ({

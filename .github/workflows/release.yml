@@ -9,14 +9,27 @@ permissions:
   contents: write
 
 jobs:
-  release-windows:
-    name: Build and release Windows app
-    runs-on: windows-latest
+  release-cross-platform:
+    name: Build and release ${{ matrix.job-name }} app
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            job-name: Windows
+            release-script: pnpm release:win
+          - os: ubuntu-latest
+            job-name: Linux
+            release-script: pnpm release:linux
+          - os: macos-latest
+            job-name: macOS
+            release-script: pnpm release:mac
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -38,4 +51,4 @@ jobs:
       - name: Build and publish release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: pnpm release:win
+        run: ${{ matrix.release-script }}

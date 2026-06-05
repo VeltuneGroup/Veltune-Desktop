@@ -145,23 +145,6 @@
   translate: var(--lyrics-active-offset);
 }
 
-.current .text-lyrics::before {
-  content: '';
-  position: absolute;
-  left: 0.8rem;
-  right: 0;
-  top: 0.2rem;
-  bottom: 0.2rem;
-  width: calc(var(--line-progress, 0) * 100%);
-  border-radius: 999px;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.12),
-    rgba(255, 255, 255, 0.02)
-  );
-  pointer-events: none;
-}
-
 .current .text-lyrics > span > span {
   opacity: var(--lyrics-active-opacity);
   animation: var(--lyrics-animations);
