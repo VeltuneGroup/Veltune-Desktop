@@ -2,7 +2,7 @@
 
 # Veltune Desktop
 
->  Veltune Desktop is actively developed and may change frequently. Expect occasional bugs in early releases.
+  Veltune Desktop is actively developed and may change frequently. Expect occasional bugs in early releases.
 
 
 [![GitHub release](https://img.shields.io/github/release/VeltuneGroup/Veltune-Desktop.svg?style=for-the-badge&logo=github)](https://github.com/VeltuneGroup/Veltune-Desktop/releases/)
