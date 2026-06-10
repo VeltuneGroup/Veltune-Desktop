@@ -51,13 +51,7 @@ export default createPlugin({
       changedOptions: Partial<PreciseVolumePluginConfig>,
       options: PreciseVolumePluginConfig,
     ) {
-      for (const option in changedOptions) {
-        // HACK: Weird TypeScript error
-        (options as Record<string, unknown>)[option] = (
-          changedOptions as Record<string, unknown>
-        )[option];
-      }
-
+      Object.assign(options, changedOptions);
       setConfig(options);
     }
 

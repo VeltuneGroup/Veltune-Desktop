@@ -91,12 +91,11 @@ export const startPlugin = async <Config extends PluginConfig>(
     // HACK: for bind 'this' to context
     const defContext = def[options.ctx];
     if (defContext && typeof defContext !== 'function') {
-      Object.entries(defContext).forEach(([key, value]) => {
+      for (const [key, value] of Object.entries(defContext)) {
         if (typeof value === 'function') {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-          defContext[key as keyof typeof defContext] = value.bind(defContext);
+          (defContext as Record<string, unknown>)[key] = value.bind(defContext);
         }
-      });
+      }
     }
 
     const start = performance.now();

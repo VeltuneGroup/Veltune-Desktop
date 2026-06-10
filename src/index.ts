@@ -64,7 +64,7 @@ import type { PluginConfig } from '@/types/plugins';
 // Catch errors and log them
 unhandled({
   logger: console.error,
-  showDialog: false,
+  showDialog: true,
 });
 
 // Prevent window being garbage collected
@@ -221,11 +221,19 @@ const initHook = async (win: BrowserWindow) => {
           if (config.enabled) {
             win.webContents.send('plugin:enable', id);
             ipcMain.emit('plugin:enable', id);
-            forceLoadMainPlugin(id, win);
+            forceLoadMainPlugin(id, win).catch((err) => {
+              console.error(LoggerPrefix, `Failed to load plugin "${id}":`, err);
+            });
           } else {
             win.webContents.send('plugin:unload', id);
             ipcMain.emit('plugin:unload', id);
-            forceUnloadMainPlugin(id, win);
+            forceUnloadMainPlugin(id, win).catch((err) => {
+              console.error(
+                LoggerPrefix,
+                `Failed to unload plugin "${id}":`,
+                err,
+              );
+            });
           }
 
           if (allPluginStubs[id]?.restartNeeded) {
