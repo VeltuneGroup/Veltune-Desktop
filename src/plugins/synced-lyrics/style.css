@@ -139,6 +139,11 @@
   white-space: pre-wrap;
 }
 
+.lyric-char {
+  display: inline;
+  color: rgba(255, 255, 255, 1);
+}
+
 .current .text-lyrics {
   font-weight: var(--lyrics-active-font-weight) !important;
   scale: var(--lyrics-active-scale);
@@ -150,7 +155,7 @@
   animation: var(--lyrics-animations);
 }
 
-.current .lyric-word {
+.current .romaji .lyric-word {
   background: linear-gradient(
     90deg,
     rgba(255, 255, 255, 1) calc(var(--word-progress, 0) * 100%),
@@ -161,11 +166,11 @@
   color: transparent;
 }
 
-.previous .lyric-word {
+.previous .romaji .lyric-word {
   color: rgba(255, 255, 255, 1);
 }
 
-.upcoming .lyric-word {
+.upcoming .romaji .lyric-word {
   color: rgba(255, 255, 255, 0.45);
 }
 

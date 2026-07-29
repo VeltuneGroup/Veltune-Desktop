@@ -20,29 +20,32 @@ interface SyncedLineProps {
   translation?: string;
 }
 
-const getWordProgress = (
+const getCharOpacity = (
   word: WordLyrics,
+  charIndex: number,
+  totalChars: number,
   status: SyncedLineProps['status'],
   now: number,
   leadMs: number,
-) => {
-  if (status === 'previous') {
-    return 1;
-  }
-
-  if (status === 'upcoming') {
-    return 0;
-  }
+): number => {
+  if (status === 'previous') return 1;
+  if (status === 'upcoming') return 0.28;
 
   const lineNow = now + leadMs - effectiveOffsetMs();
-  if (word.duration <= 0) {
-    return lineNow >= word.timeInMs ? 1 : 0;
-  }
+  if (word.duration <= 0) return lineNow >= word.timeInMs ? 1 : 0.28;
 
-  return Math.min(
-    1,
-    Math.max(0, (lineNow - word.timeInMs) / Math.max(word.duration, 1)),
-  );
+  const elapsed = lineNow - word.timeInMs;
+  if (elapsed <= 0) return 0.28;
+
+  const wordProgress = Math.min(1, Math.max(0, elapsed / word.duration));
+  if (totalChars === 0) return 1;
+
+  const charPos = charIndex / totalChars;
+  const delta = wordProgress - charPos;
+
+  if (delta <= 0) return 0.28;
+  if (delta >= 0.15) return 1;
+  return 0.28 + (delta / 0.15) * 0.72;
 };
 
 const EmptyLine = (props: SyncedLineProps) => {
@@ -178,20 +181,25 @@ export const SyncedLine = (props: SyncedLineProps) => {
           >
             <span class="word-line">
               <For each={words()}>
-                {(word) => (
-                  <span
-                    class="lyric-word"
-                    style={{
-                      '--word-progress': `${getWordProgress(word, props.status, currentTime(), wordLeadMs())}`,
-                    }}
-                  >
-                    <yt-formatted-string
-                      text={{
-                        runs: [{ text: word.text }],
-                      }}
-                    />
-                  </span>
-                )}
+                {(word) => {
+                  const chars = [...word.text];
+                  return (
+                    <span class="lyric-word">
+                      <For each={chars} by={(_, i) => i}>
+                        {(char, i) => (
+                          <span
+                            class="lyric-char"
+                            style={{
+                              opacity: getCharOpacity(word, i(), chars.length, props.status, currentTime(), wordLeadMs()),
+                            }}
+                          >
+                            {char}
+                          </span>
+                        )}
+                      </For>
+                    </span>
+                  );
+                }}
               </For>
             </span>
 
