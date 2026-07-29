@@ -160,6 +160,16 @@ export default createPlugin({
         visualizerType = butterchurn;
       }
 
+      let currentVisualizer: Visualizer<unknown> | null = null;
+      let currentObserver: ResizeObserver | null = null;
+
+      const cleanup = () => {
+        currentVisualizer?.destroy();
+        currentVisualizer = null;
+        currentObserver?.disconnect();
+        currentObserver = null;
+      };
+
       document.addEventListener(
         'ytmd:audio-can-play',
         (e) => {
@@ -192,6 +202,8 @@ export default createPlugin({
 
           resizeCanvas();
 
+          cleanup();
+
           const gainNode = e.detail.audioContext.createGain();
           gainNode.gain.value = 1.25;
           e.detail.audioSource.connect(gainNode);
@@ -221,6 +233,9 @@ export default createPlugin({
             }
           });
           visualizerContainerObserver.observe(visualizerContainer);
+
+          currentVisualizer = visualizer;
+          currentObserver = visualizerContainerObserver;
 
           visualizer.render();
         },

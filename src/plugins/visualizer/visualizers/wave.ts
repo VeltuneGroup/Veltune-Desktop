@@ -19,11 +19,11 @@ class WaveVisualizer extends Visualizer<Wave> {
     options: VisualizerPluginConfig,
   ) {
     super(
+      audioNode,
       audioContext,
       audioSource,
       visualizerContainer,
       canvas,
-      audioNode,
       stream,
       options,
     );
@@ -47,6 +47,10 @@ class WaveVisualizer extends Visualizer<Wave> {
   resize(_: number, __: number) {}
 
   render() {}
+
+  destroy() {
+    this._audioNode.disconnect();
+  }
 }
 
 export default WaveVisualizer;

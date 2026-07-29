@@ -8,15 +8,16 @@ export abstract class Visualizer<T> {
   abstract visualizer: T;
 
   protected constructor(
+    protected _audioNode: GainNode,
     _audioContext: AudioContext,
     _audioSource: MediaElementAudioSourceNode,
     _visualizerContainer: HTMLElement,
     _canvas: HTMLCanvasElement,
-    _audioNode: GainNode,
     _stream: MediaStream,
     _options: VisualizerPluginConfig,
   ) {}
 
   abstract resize(width: number, height: number): void;
   abstract render(): void;
+  abstract destroy(): void;
 }

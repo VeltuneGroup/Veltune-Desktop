@@ -19,11 +19,11 @@ class VudioVisualizer extends Visualizer<Vudio> {
     options: VisualizerPluginConfig,
   ) {
     super(
+      audioNode,
       audioContext,
       audioSource,
       visualizerContainer,
       canvas,
-      audioNode,
       stream,
       options,
     );
@@ -46,6 +46,11 @@ class VudioVisualizer extends Visualizer<Vudio> {
   }
 
   render() {}
+
+  destroy() {
+    this.visualizer.pause();
+    this._audioNode.disconnect();
+  }
 }
 
 export default VudioVisualizer;

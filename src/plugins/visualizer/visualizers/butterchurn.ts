@@ -10,6 +10,7 @@ class ButterchurnVisualizer extends Visualizer<Butterchurn> {
 
   visualizer: ReturnType<typeof Butterchurn.createVisualizer>;
   private readonly renderingFrequencyInMs: number;
+  private rafId = 0;
 
   constructor(
     audioContext: AudioContext,
@@ -21,11 +22,11 @@ class ButterchurnVisualizer extends Visualizer<Butterchurn> {
     options: VisualizerPluginConfig,
   ) {
     super(
+      audioNode,
       audioContext,
       audioSource,
       visualizerContainer,
       canvas,
-      audioNode,
       stream,
       options,
     );
@@ -49,10 +50,15 @@ class ButterchurnVisualizer extends Visualizer<Butterchurn> {
 
   render() {
     const renderVisualizer = () => {
-      requestAnimationFrame(renderVisualizer);
+      this.rafId = requestAnimationFrame(renderVisualizer);
       this.visualizer.render();
     };
     setTimeout(renderVisualizer, this.renderingFrequencyInMs);
+  }
+
+  destroy() {
+    cancelAnimationFrame(this.rafId);
+    this._audioNode.disconnect();
   }
 }
 

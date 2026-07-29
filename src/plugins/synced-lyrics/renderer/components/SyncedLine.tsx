@@ -1,4 +1,4 @@
-import { createEffect, createMemo, createSignal, For, Show } from 'solid-js';
+import { createEffect, createMemo, createSignal, For, Index, Show } from 'solid-js';
 
 import { type VirtualizerHandle } from 'virtua/solid';
 
@@ -185,18 +185,18 @@ export const SyncedLine = (props: SyncedLineProps) => {
                   const chars = [...word.text];
                   return (
                     <span class="lyric-word">
-                      <For each={chars} by={(_, i) => i}>
+                      <Index each={chars}>
                         {(char, i) => (
                           <span
                             class="lyric-char"
                             style={{
-                              opacity: getCharOpacity(word, i(), chars.length, props.status, currentTime(), wordLeadMs()),
+                              opacity: getCharOpacity(word, i, chars.length, props.status, currentTime(), wordLeadMs()),
                             }}
                           >
-                            {char}
+                            {char()}
                           </span>
                         )}
-                      </For>
+                      </Index>
                     </span>
                   );
                 }}

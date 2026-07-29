@@ -282,11 +282,19 @@ export default createPlugin<
         video.addEventListener('timeupdate', transitionBeforeEnd);
       };
 
+      let crossfadeGeneration = 0;
+      let currentFader: VolumeFader | null = null;
+
       const crossfade = (cb: () => void) => {
         if (!isReadyToCrossfade()) {
           cb();
           return;
         }
+
+        currentFader?.stop();
+        currentFader = null;
+
+        const generation = ++crossfadeGeneration;
 
         let resolveTransition: () => void;
         waitForTransition = new Promise<void>((resolve) => {
@@ -301,9 +309,12 @@ export default createPlugin<
           fadeDuration: this.config?.fadeOutDuration,
         });
 
+        currentFader = fader;
+
         // Fade out the music
         video.volume = 0;
         fader.fadeOut(() => {
+          if (generation !== crossfadeGeneration) return;
           resolveTransition();
           cb();
         });
