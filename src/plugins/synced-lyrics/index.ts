@@ -31,6 +31,7 @@ export default createPlugin({
     activeScale: 1,
     glowStrength: 0.5,
     gapIndicatorThresholdMs: 5000,
+    leadMs: 0,
   } satisfies SyncedLyricsPluginConfig as SyncedLyricsPluginConfig,
 
   menu,

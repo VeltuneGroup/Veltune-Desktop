@@ -48,6 +48,23 @@ const getCharOpacity = (
   return 0.28 + (delta / 0.15) * 0.72;
 };
 
+const calculateAutoLead = (line: LineLyrics): number => {
+  if (!line.words || line.words.length < 2) return line.isWordSynced ? 90 : 140;
+
+  let totalGap = 0;
+  let count = 0;
+  for (let i = 1; i < line.words.length; i++) {
+    const gap = line.words[i].timeInMs - (line.words[i - 1].timeInMs + line.words[i - 1].duration);
+    if (gap > 0) {
+      totalGap += gap;
+      count++;
+    }
+  }
+
+  const avgGap = count > 0 ? totalGap / count : 0;
+  return Math.min(150, Math.max(30, Math.round(avgGap * 0.15)));
+};
+
 const EmptyLine = (props: SyncedLineProps) => {
   const states = createMemo(() => {
     const defaultText = config()?.defaultTextString ?? '';
@@ -120,7 +137,11 @@ const EmptyLine = (props: SyncedLineProps) => {
 export const SyncedLine = (props: SyncedLineProps) => {
   const text = createMemo(() => props.line.text.trim());
   const words = createMemo(() => props.line.words ?? []);
-  const wordLeadMs = createMemo(() => (props.line.isWordSynced ? 90 : 140));
+  const wordLeadMs = createMemo(() => {
+    const configLead = config()?.leadMs;
+    if (configLead && configLead > 0) return configLead;
+    return calculateAutoLead(props.line);
+  });
   const lineProgress = createMemo(() => {
     const now =
       currentTime() + Math.min(wordLeadMs(), 90) - effectiveOffsetMs();

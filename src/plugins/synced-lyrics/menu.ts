@@ -321,6 +321,23 @@ export const menu = async (
       ),
     },
     {
+      label: 'Lead time',
+      toolTip:
+        'How early characters light up before their timestamp. Auto adapts to song tempo, 0 = auto.',
+      type: 'submenu',
+      submenu: [
+        radio('Auto', config.leadMs === 0, 0, (leadMs) => ctx.setConfig({ leadMs })),
+        ...([30, 50, 70, 90, 120, 150] as const).map((value) =>
+          radio(
+            `${value}ms`,
+            config.leadMs === value,
+            value,
+            (leadMs) => ctx.setConfig({ leadMs }),
+          ),
+        ),
+      ],
+    },
+    {
       label: 'Instrumental gap threshold',
       toolTip:
         'Show the instrumental label after this much silence between lines.',

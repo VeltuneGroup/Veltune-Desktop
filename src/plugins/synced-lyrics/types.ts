@@ -31,6 +31,7 @@ export type SyncedLyricsPluginConfig = {
   activeScale: number;
   glowStrength: number;
   gapIndicatorThresholdMs: number;
+  leadMs: number;
 };
 
 export type LineLyricsStatus = 'previous' | 'current' | 'upcoming';
