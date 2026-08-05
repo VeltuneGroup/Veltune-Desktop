@@ -66,9 +66,6 @@ linux:
       arch:
         - x64
         - arm64
-    - target: snap
-      arch:
-        - x64
     - target: freebsd
       arch:
         - x64
@@ -117,9 +114,5 @@ rpm:
   fpm:
     - '--rpm-rpmbuild-define'
     - _build_id_links none
-snap:
-  slots:
-    - mpris:
-        interface: mpris
 directories:
   output: ./pack/
