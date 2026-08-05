@@ -180,7 +180,6 @@ class MusixMatchAPI {
     }
   }
 
-  // god I love typescript generics, they're so useful
   public async query<
     T extends Endpoint,
     R = {
@@ -272,7 +271,7 @@ class MusixMatchAPI {
 
     localStorage.setItem(
       this.key,
-      JSON.stringify({ token: this.token, expires: Date.now() + (60 * 1000) }),
+      JSON.stringify({ token: this.token, expires: Date.now() + 60 * 1000 }),
     );
   }
 

@@ -161,7 +161,6 @@ const hasJapanese = (lines: string[]) =>
     (line) => Kuroshiro.Util.hasKana(line) || shinjitaiRegex.test(line),
   );
 
-// tests for Hangul characters, sufficient for our use case
 const hasKorean = (lines: string[]) =>
   lines.some((line) => /[ㄱ-ㅎㅏ-ㅣ가-힣]+/.test(line));
 
@@ -252,7 +251,6 @@ export const romanize = async (line: string) => {
     return handler(line);
   }
 
-  // fallback
   if (hasJapanese([line])) line = await romanizeJapanese(line);
   if (hasKorean([line])) line = romanizeHangul(line);
   if (hasChinese([line])) line = romanizeChinese(line);

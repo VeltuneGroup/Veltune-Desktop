@@ -1,4 +1,3 @@
-/* Hides the original lyrics, to only show our own.  */
 #tab-renderer[page-type='MUSIC_PAGE_TYPE_TRACK_LYRICS'] > * {
   display: none !important;
 }
@@ -9,7 +8,6 @@
   height: 100%;
 }
 
-/* Hide the scrollbar in the lyrics-tab */
 #tab-renderer[page-type='MUSIC_PAGE_TYPE_TRACK_LYRICS'] {
   scrollbar-width: none;
 }
@@ -20,13 +18,10 @@
   initial-value: 2s;
 }
 
-/* Variables are overridden by selected line effect */
 :root {
-  /* Layout */
   --global-margin: 0.7rem;
   --lyrics-padding: 0;
 
-  /* Typography */
   --lyrics-font-family:
     Satoshi, Avenir, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
     Oxygen, Ubuntu, Cantarell, Open Sans, Helvetica Neue, sans-serif;
@@ -34,13 +29,11 @@
   --lyrics-line-height: var(--ytmusic-body-line-height);
   --lyrics-width: 100%;
 
-  /* Inactive Lyrics */
   --lyrics-inactive-font-weight: 400;
   --lyrics-inactive-opacity: 0.33;
   --lyrics-inactive-scale: 1;
   --lyrics-inactive-offset: 0;
 
-  /* Active Lyrics */
   --lyrics-active-font-weight: 700;
   --lyrics-active-opacity: 1;
   --lyrics-active-scale: 1;
@@ -48,7 +41,6 @@
 
   --lyrics-duration: 2s;
 
-  /* Animations */
   --lyrics-animations:
     lyrics-glow var(--lyrics-glow-duration) forwards,
     lyrics-wobble var(--lyrics-wobble-duration) forwards;
@@ -57,7 +49,6 @@
   --lyrics-glow-duration: var(--lyrics-duration);
   --lyrics-wobble-duration: calc(var(--lyrics-duration) / 2);
 
-  /* Colors */
   --glow-color: rgba(255, 255, 255, 0.5);
 }
 
@@ -76,7 +67,6 @@
 
   & .text-lyrics {
     cursor: pointer;
-    /*fix cuted lyrics-glow and romanized j at line start */
     padding-left: 1.5rem;
   }
 
@@ -235,7 +225,6 @@ div:has(> .lyrics-picker) {
   }
 }
 
-/* Animations */
 @keyframes lyrics-wobble {
   from {
     transform: translateY(0px);
@@ -272,13 +261,6 @@ div:has(> .lyrics-picker) {
   font-size: 24px;
 }
 
-/* =====================================================
-   Cinematic lyrics (experimental)
-   Scoped under [data-lyrics-effect='cinematic'], set by the
-   "Cinematic lyrics" toggle in the synced-lyrics menu.
-   Adapted from a BetterLyrics-style karaoke stylesheet.
-   ===================================================== */
-
 [data-lyrics-effect='cinematic'] {
   --blyrics-lyric-active-color: #ffffff;
   --blyrics-lyric-inactive-color: rgba(243, 233, 220, 0.07);
@@ -311,7 +293,6 @@ div:has(> .lyrics-picker) {
   transform-style: preserve-3d;
 }
 
-/* Inactive lines: fade out and fall away in 3D */
 [data-lyrics-effect='cinematic'] .synced-line {
   width: 100% !important;
   color: var(--blyrics-lyric-inactive-color);
@@ -349,7 +330,6 @@ div:has(> .lyrics-picker) {
   transition: none;
 }
 
-/* Words: the line-level color/opacity controls visibility */
 [data-lyrics-effect='cinematic'] .text-lyrics > span > span {
   display: inline-block;
   white-space: pre-wrap;
@@ -368,7 +348,6 @@ div:has(> .lyrics-picker) {
   opacity: 0.25 !important;
 }
 
-/* Active line: white, flat, breathing glow */
 [data-lyrics-effect='cinematic'] .synced-line.current {
   position: relative;
   z-index: 2;
@@ -386,13 +365,10 @@ div:has(> .lyrics-picker) {
     transform 0.6s var(--blyrics-ease-enter-transform);
 }
 
-/* Breathing glow pulse lives here (2 levels from the text) so the
-   inherited text-shadow reliably reaches the word spans */
 [data-lyrics-effect='cinematic'] .synced-line.current .text-lyrics {
   animation: lyrics-cinematic-breath 14s ease-in-out infinite alternate;
 }
 
-/* Idle state (no current line, e.g. between songs): flatten everything */
 [data-lyrics-effect='cinematic']
   .synced-lyrics-vlist:not(:has(.synced-line.current))
   .synced-line {

@@ -53,7 +53,6 @@ interface SearchCache {
   data: SearchCacheData;
 }
 
-// TODO: Maybe use localStorage for the cache.
 const searchCache = new Map<VideoId, SearchCache>();
 export const fetchLyrics = (info: SongInfo) => {
   if (searchCache.has(info.videoId)) {
@@ -68,7 +67,6 @@ export const fetchLyrics = (info: SongInfo) => {
 
     if (getSongInfo().videoId === info.videoId) {
       setLyricsStore('lyrics', () => {
-        // weird bug with solid-js
         return JSON.parse(JSON.stringify(cache.data)) as typeof cache.data;
       });
     }
@@ -84,7 +82,6 @@ export const fetchLyrics = (info: SongInfo) => {
   searchCache.set(info.videoId, cache);
   if (getSongInfo().videoId === info.videoId) {
     setLyricsStore('lyrics', () => {
-      // weird bug with solid-js
       return JSON.parse(JSON.stringify(cache.data)) as typeof cache.data;
     });
   }

@@ -64,7 +64,6 @@ export const renderer = createRenderer<
     this.observer ??= new MutationObserver(this.observerCallback);
     this.observer.disconnect();
 
-    // Force the lyrics tab to be enabled at all times.
     const header = await waitForElement<HTMLElement>(selectors.head);
     {
       header.removeAttribute('disabled');

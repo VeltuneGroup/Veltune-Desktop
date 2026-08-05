@@ -32,14 +32,12 @@ runWithOwner(reactiveOwner, () => {
     if (!config()?.enabled) return;
     const root = document.documentElement;
 
-    // Cinematic (experimental) overrides the line effect
     if (config()?.cinematic) {
       root.dataset.lyricsEffect = 'cinematic';
       return;
     }
     root.removeAttribute('data-lyrics-effect');
 
-    // Set the line effect
     switch (config()?.lineEffect) {
       case 'fancy':
         root.style.setProperty('--lyrics-font-size', '3rem');
@@ -173,10 +171,8 @@ export const LyricsRenderer = () => {
     const showPicker = isInView || isMouseOver;
 
     if (showPicker) {
-      // picker visible
       stickyRef()!.style.setProperty('--lyrics-picker-top', '0');
     } else {
-      // picker hidden
       stickyRef()!.style.setProperty('--lyrics-picker-top', `-${height}px`);
     }
   };
@@ -273,10 +269,6 @@ export const LyricsRenderer = () => {
 
     if (!scroller() || !current.data?.lines) return;
 
-    // The vlist carries the lyrics-picker as item 0, so the current lyric
-    // line (line coords idx) lives at vlist index idx + 1. Center that
-    // exact item (clamped to the last real item) so the active line always
-    // sits dead-center, including the first and last lines of the track.
     const scrollIndex = Math.min(idx + 1, lineCount);
 
     scroller()!.scrollToIndex(scrollIndex, {
