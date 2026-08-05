@@ -3,7 +3,7 @@
   "name": "youtube-music",
   "desktopName": "com.github.VeltuneGroup.Veltune_Desktop",
   "productName": "YouTube Music",
-  "version": "3.12.1",
+  "version": "3.12.2",
   "description": "YouTube Music Desktop App - including custom plugins",
   "main": "./dist/main/index.js",
   "type": "module",
