@@ -150,8 +150,6 @@ jobs:
           body: |
             See [changelog](https://github.com/VeltuneGroup/Veltune-Desktop/blob/main/changelog.md#${{ env.CHANGELOG_ANCHOR }}) for the list of updates and the full diff.
 
-            Thanks to all contributors! 🏅
-
             (Note for Windows: `YouTube Music Web Setup-${{ env.VERSION_TAG }}.exe` is an installer, and `YouTube Music-${{ env.VERSION_TAG }}.exe` is a portable version)
 
       - name: Update changelog
