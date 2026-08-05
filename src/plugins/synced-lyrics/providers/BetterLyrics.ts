@@ -11,7 +11,7 @@ const headers = {
 
 export class BetterLyrics implements LyricProvider {
   public name = 'BetterLyrics';
-  public baseUrl = 'https://unison.boidu.dev';
+  public baseUrl = 'https://lyrics-api.boidu.dev';
 
   async search({
     videoId,
@@ -20,45 +20,36 @@ export class BetterLyrics implements LyricProvider {
     album,
     songDuration,
   }: SearchSongInfo): Promise<LyricResult | null> {
-    if (videoId) {
-      const byVideoId = await this.safeFetch(
-        `/lyrics?v=${encodeURIComponent(videoId)}`,
-      );
-      const lines = byVideoId ? this.parseTTML(byVideoId.data?.lyrics) : [];
-      if (lines.length) {
-        return this.toResult(byVideoId, title, artist, lines);
-      }
-    }
-
     const song = title.replace(/\s+Video\s*$/i, '');
 
     let query = new URLSearchParams({ song, artist });
-    let data = await this.safeFetch(`/lyrics?${query.toString()}`);
-    let lines = data ? this.parseTTML(data.data?.lyrics) : [];
+    let data = await this.safeFetch(`/getLyrics?${query.toString()}`);
+    let lines = data ? this.parseTTML(data.ttml) : [];
     if (lines.length) {
-      return this.toResult(data, title, artist, lines);
+      return this.toResult(title, artist, lines);
     }
 
+    // Retry with extra hints that improve matching accuracy.
     if (album) query.set('album', album);
     if (songDuration) query.set('duration', String(songDuration));
-    data = await this.safeFetch(`/lyrics?${query.toString()}`);
-    lines = data ? this.parseTTML(data.data?.lyrics) : [];
+    if (videoId) query.set('videoId', videoId);
+    data = await this.safeFetch(`/getLyrics?${query.toString()}`);
+    lines = data ? this.parseTTML(data.ttml) : [];
     if (lines.length) {
-      return this.toResult(data, title, artist, lines);
+      return this.toResult(title, artist, lines);
     }
 
     return null;
   }
 
   private toResult(
-    data: BetterLyricsResponse | null,
     title: string,
     artist: string,
     lines: LineLyrics[],
   ): LyricResult {
     return {
-      title: data?.data?.song ?? title,
-      artists: [data?.data?.artist ?? artist],
+      title,
+      artists: [artist],
       lines,
     };
   }
@@ -69,7 +60,7 @@ export class BetterLyrics implements LyricProvider {
       if (!response.ok) return null;
 
       const json = (await response.json()) as BetterLyricsResponse;
-      if (!json.success || !json.data) return null;
+      if (!json.ttml) return null;
       return json;
     } catch {
       return null;
@@ -294,13 +285,6 @@ function millisToTime(millis: number): string {
 }
 
 type BetterLyricsResponse = {
-  success: boolean;
-  data?: {
-    song?: string;
-    artist?: string;
-    format?: string;
-    syncType?: string;
-    lyrics?: string;
-    score?: number;
-  };
+  ttml?: string;
+  score?: number;
 };
