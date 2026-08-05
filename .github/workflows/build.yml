@@ -14,7 +14,6 @@ jobs:
     permissions:
       contents: write
     if: github.event.pull_request.draft == false
-name: Build Veltune Desktop
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: true
