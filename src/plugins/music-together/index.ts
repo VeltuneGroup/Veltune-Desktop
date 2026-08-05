@@ -1,30 +1,29 @@
 import prompt from 'custom-electron-prompt';
 
 import { t } from '@/i18n';
-import { createPlugin } from '@/utils';
 import promptOptions from '@/providers/prompt-options';
+import { createPlugin } from '@/utils';
 import { waitForElement } from '@/utils/wait-for-element';
 
+import { Connection, type ConnectionEventUnion } from './connection';
+import { Queue } from './queue';
+import style from './style.css?inline';
+import settingHTML from './templates/setting.html?raw';
 import {
   getDefaultProfile,
   type Permission,
   type Profile,
   type VideoData,
 } from './types';
-import { Queue } from './queue';
-import { Connection, type ConnectionEventUnion } from './connection';
-import { createHostPopup } from './ui/host';
 import { createGuestPopup } from './ui/guest';
+import { createHostPopup } from './ui/host';
 import { createSettingPopup } from './ui/setting';
 
-import settingHTML from './templates/setting.html?raw';
-import style from './style.css?inline';
-
-import type { DataConnection } from 'peerjs';
-import type { YoutubePlayer } from '@/types/youtube-player';
 import type { RendererContext } from '@/types/contexts';
-import type { VideoDataChanged } from '@/types/video-data-changed';
+import type { MusicPlayer } from '@/types/music-player';
 import type { AppElement } from '@/types/queue';
+import type { VideoDataChanged } from '@/types/video-data-changed';
+import type { DataConnection } from 'peerjs';
 
 type RawAccountData = {
   accountName: {
@@ -49,7 +48,7 @@ export default createPlugin<
     ipc?: RendererContext<never>['ipc'];
     api: AppElement | null;
     queue?: Queue;
-    playerApi?: YoutubePlayer;
+    playerApi?: MusicPlayer;
     showPrompt: (title: string, label: string) => Promise<string>;
     popups: {
       host: ReturnType<typeof createHostPopup>;
@@ -215,6 +214,25 @@ export default createPlugin<
         this.ignoreChange = true;
 
         switch (event.type) {
+          case 'CLEAR_QUEUE': {
+            if (conn && this.permission === 'host-only') {
+              await this.connection?.broadcast('SYNC_QUEUE', {
+                videoList: this.queue?.videoList ?? [],
+              });
+              return;
+            }
+
+            this.queue?.clear();
+            await this.connection?.broadcast('CLEAR_QUEUE', null);
+            break;
+          }
+          case 'SET_INDEX': {
+            this.queue?.setIndex(event.payload.index);
+            await this.connection?.broadcast('SET_INDEX', {
+              index: event.payload.index,
+            });
+            break;
+          }
           case 'ADD_SONGS': {
             if (conn && this.permission === 'host-only') {
               await this.connection?.broadcast('SYNC_QUEUE', {
@@ -231,10 +249,20 @@ export default createPlugin<
             );
 
             await this.queue?.addVideos(videoList, event.payload.index);
-            await this.connection?.broadcast('ADD_SONGS', {
-              ...event.payload,
-              videoList,
-            });
+            await this.connection?.broadcast(
+              'ADD_SONGS',
+              {
+                ...event.payload,
+                videoList,
+              },
+              event.after,
+            );
+
+            const afterevent = event.after?.at(0);
+            if (afterevent?.type === 'SET_INDEX') {
+              this.queue?.setIndex(afterevent.payload.index);
+            }
+
             break;
           }
           case 'REMOVE_SONG': {
@@ -319,20 +347,12 @@ export default createPlugin<
               }
             }
             if (permissionLevel >= 1) {
-              const targetIndex = event.payload?.currentVideo
-                ? (this.queue?.findVideoIndex(event.payload.currentVideo) ?? -1)
-                : event.payload?.index;
+              if (typeof event.payload?.index === 'number') {
+                const nowIndex = this.queue?.selectedIndex ?? 0;
 
-              if (typeof targetIndex === 'number' && targetIndex >= 0) {
-                const nowIndex = this.queue?.selectedIndex;
-
-                if (nowIndex !== targetIndex) {
-                  this.queue?.setIndex(targetIndex);
+                if (nowIndex !== event.payload.index) {
+                  this.queue?.setIndex(event.payload.index);
                 }
-              } else if (event.payload?.currentVideo) {
-                await this.connection?.broadcast('SYNC_QUEUE', {
-                  videoList: this.queue?.videoList ?? [],
-                });
               }
             }
 
@@ -378,12 +398,7 @@ export default createPlugin<
       );
       if (typeof id !== 'string') return false;
 
-      const normalizedId = id.trim();
-      if (!normalizedId) return false;
-
-      const connection = await this.connection
-        .connect(normalizedId)
-        .catch(() => false);
+      const connection = await this.connection.connect(id).catch(() => false);
       if (!connection) return false;
       this.connection.onConnections((connection) => {
         if (!connection?.open) {
@@ -398,14 +413,28 @@ export default createPlugin<
       const queueListener = async (event: ConnectionEventUnion) => {
         this.ignoreChange = true;
         switch (event.type) {
-          case 'ADD_SONGS': {
-            await this.connection?.broadcast('ADD_SONGS', {
-              ...event.payload,
-              videoList: event.payload.videoList.map((it) => ({
-                ...it,
-                ownerId: it.ownerId ?? this.connection!.id,
-              })),
+          case 'CLEAR_QUEUE': {
+            await this.connection?.broadcast('CLEAR_QUEUE', null);
+            break;
+          }
+          case 'SET_INDEX': {
+            await this.connection?.broadcast('SET_INDEX', {
+              index: event.payload.index,
             });
+            break;
+          }
+          case 'ADD_SONGS': {
+            await this.connection?.broadcast(
+              'ADD_SONGS',
+              {
+                ...event.payload,
+                videoList: event.payload.videoList.map((it) => ({
+                  ...it,
+                  ownerId: it.ownerId ?? this.connection!.id,
+                })),
+              },
+              event.after,
+            );
             break;
           }
           case 'REMOVE_SONG': {
@@ -433,6 +462,14 @@ export default createPlugin<
       const listener = async (event: ConnectionEventUnion) => {
         this.ignoreChange = true;
         switch (event.type) {
+          case 'CLEAR_QUEUE': {
+            this.queue?.clear();
+            break;
+          }
+          case 'SET_INDEX': {
+            this.queue?.setIndex(event.payload.index);
+            break;
+          }
           case 'ADD_SONGS': {
             const videoList: VideoData[] = event.payload.videoList.map(
               (it) => ({
@@ -442,6 +479,12 @@ export default createPlugin<
             );
 
             await this.queue?.addVideos(videoList, event.payload.index);
+
+            const afterevent = event.after?.at(0);
+            if (afterevent?.type === 'SET_INDEX') {
+              this.queue?.setIndex(afterevent.payload.index);
+            }
+
             break;
           }
           case 'REMOVE_SONG': {
@@ -490,18 +533,12 @@ export default createPlugin<
               if (event.payload?.state === 2) this.playerApi?.pauseVideo();
               if (event.payload?.state === 1) this.playerApi?.playVideo();
             }
-            const targetIndex = event.payload?.currentVideo
-              ? (this.queue?.findVideoIndex(event.payload.currentVideo) ?? -1)
-              : event.payload?.index;
+            if (typeof event.payload?.index === 'number') {
+              const nowIndex = this.queue?.selectedIndex ?? 0;
 
-            if (typeof targetIndex === 'number' && targetIndex >= 0) {
-              const nowIndex = this.queue?.selectedIndex;
-
-              if (nowIndex !== targetIndex) {
-                this.queue?.setIndex(targetIndex);
+              if (nowIndex !== event.payload.index) {
+                this.queue?.setIndex(event.payload.index);
               }
-            } else if (event.payload?.currentVideo) {
-              await this.connection?.broadcast('SYNC_QUEUE', undefined);
             }
             break;
           }
@@ -726,14 +763,12 @@ export default createPlugin<
 
       this.stateInterval = window.setInterval(() => {
         if (this.connection?.mode !== 'host') return;
-        const index = this.queue?.selectedIndex;
-        const currentVideo = this.queue?.selectedVideo;
+        const index = this.queue?.selectedIndex ?? 0;
 
         this.connection.broadcast('SYNC_PROGRESS', {
           progress: this.playerApi?.getCurrentTime(),
           state: this.playerApi?.getPlayerState(),
-          ...(typeof index === 'number' ? { index } : undefined),
-          ...(currentVideo ? { currentVideo } : undefined),
+          index,
         });
       }, 1000);
 

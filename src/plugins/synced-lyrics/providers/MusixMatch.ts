@@ -48,15 +48,6 @@ export class MusixMatch implements LyricProvider {
           }))
         : undefined,
       lyrics: lyrics,
-      meta: {
-        exact:
-          track.track_name.toLowerCase() ===
-          (info.alternativeTitle || info.title).toLowerCase(),
-        inexact:
-          track.track_name.toLowerCase() !==
-          (info.alternativeTitle || info.title).toLowerCase(),
-        fallbackUsed: false,
-      },
     };
   }
 }
@@ -281,7 +272,7 @@ class MusixMatchAPI {
 
     localStorage.setItem(
       this.key,
-      JSON.stringify({ token: this.token, expires: Date.now() + 60 * 1000 }),
+      JSON.stringify({ token: this.token, expires: Date.now() + (60 * 1000) }),
     );
   }
 

@@ -1,9 +1,8 @@
-appId: com.github.VeltuneGroup.Veltune-Desktop
-productName: YouTube Music
+appId: "com.github.VeltuneGroup.Veltune-Desktop"
+productName: "YouTube Music"
 publish:
-  - provider: github
-    owner: VeltuneGroup
-    repo: Veltune-Desktop
+  - provider: generic
+    url: https://github.com/VeltuneGroup/Veltune-Desktop/releases/download/latest
 files:
   - '!*'
   - dist
@@ -24,7 +23,7 @@ mac:
       arch:
         - x64
         - arm64
-  icon: assets/generated/icons/mac/icon.icns
+  icon: assets/generated/icons/mac/icon.icon
   compression: maximum
 win:
   icon: assets/generated/icons/win/icon.ico
@@ -45,15 +44,19 @@ nsisWeb:
 linux:
   icon: assets/generated/icons/png
   category: AudioVideo
+  syncDesktopName: true
   desktop:
     entry:
-      StartupWMClass: com.github.VeltuneGroup.Veltune_Desktop
+      StartupWMClass: "com.github.VeltuneGroup.Veltune_Desktop"
   target:
     - target: AppImage
       arch:
         - x64
         - arm64
         - armv7l
+    - target: flatpak
+      arch:
+        - x64
     - target: deb
       arch:
         - x64
@@ -77,10 +80,25 @@ linux:
         - arm64
         - armv7l
 appImage:
-  description: >-
-    YouTube Music Desktop App bundled with custom plugins (and built-in ad
-    blocker / downloader)
+  description: "\u0059\u006f\u0075\u0054\u0075\u0062\u0065\u0020\u004d\u0075\u0073\u0069\u0063 Desktop App bundled with custom plugins"
   category: AudioVideo
+flatpak:
+  description: "\u0059\u006f\u0075\u0054\u0075\u0062\u0065\u0020\u004d\u0075\u0073\u0069\u0063 Desktop App bundled with custom plugins"
+  category: AudioVideo
+  runtimeVersion: '24.08'
+  baseVersion: '24.08'
+  finishArgs:
+    - '--socket=wayland'
+    - '--socket=x11'
+    - '--share=ipc'
+    - '--device=dri'
+    - '--socket=pulseaudio'
+    - '--share=network'
+    - '--filesystem=xdg-music:rw'
+    - '--talk-name=org.freedesktop.Notifications'
+    - '--talk-name=org.gnome.SessionManager'
+    - '--talk-name=org.kde.StatusNotifierWatcher'
+    - "--own-name=org.mpris.MediaPlayer2.\u0059\u006f\u0075\u0074\u0075\u0062\u0065\u004d\u0075\u0073\u0069\u0063.*"
 deb:
   depends:
     - libgtk-3-0
@@ -95,7 +113,7 @@ deb:
     - libgbm1
 rpm:
   depends:
-    - /usr/lib64/libuuid.so.1
+    - libuuid
   fpm:
     - '--rpm-rpmbuild-define'
     - _build_id_links none

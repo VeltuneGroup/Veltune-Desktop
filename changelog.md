@@ -1,0 +1,36 @@
+- fix(deps): update dependency pinyin-pro to v3.28.1
+- Remove compact sidebar plugin
+- feat(transparent-player): Added Linux and macOS support
+- feat(api-server): add websocket authorization
+- fix(deps): update dependency youtubei.js to v17.2.0
+- fixed download Type error
+- chore(deps): update babel monorepo (major)
+- chore(deps): update dependency youtubei.js to v17.1.0
+- fix(deps): update dependency youtubei.js to v17.1.0
+- chore(deps): update oxlint monorepo
+- chore(deps): update babel monorepo
+- chore(deps): update dependency @electron/universal to v3.0.4
+- chore(deps): update dependency electron to v42.5.0
+- chore(deps): update dependency oxfmt to v0.56.0
+- chore(deps): update dependency @typescript/native-preview to v7.0.0-dev.20260623.1
+- chore(deps): update playwright monorepo
+- fix(deps): update dependency hono to v4.12.27
+- fix(deps): update dependency node-html-parser to v8.0.3
+- chore(deps): update dependency @xmldom/xmldom@&lt;0.8.12 to v0.8.13 [security]
+- chore(deps): update dependency ts-morph to v28
+- fix(deps): update dependency virtua to v0.49.1
+- chore(deps): update dependency builtin-modules to v5.1.0
+- chore(deps): update dependency pinyin-pro to v3.28.1
+- chore(deps): update dependency @babel/runtime to v7.29.2
+- chore(deps): update actions/dependency-review-action digest to f5b9717
+- refactor(taskbar-mediacontrol): Removed jimp dependency
+- chore(deps): update dependency electron to v40.8.5
+- fix(api-server): add required 'alg' option to JWT middleware
+- fix: enhance connection error handling and reconnection logic
+- fix: update WM_CLASS for improved compatibility
+- fix(rolldown): fix bundling
+- feat(websocket): handle player state on app quit
+- fix: migrate custom element from ES5 to ES6
+- feat: migrate from eslint to oxlint
+- chore: update dependencies and remove unused code
+- chore: bump dependencies

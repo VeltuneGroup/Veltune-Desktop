@@ -1,14 +1,19 @@
-import style from './style.css?inline';
-import { createPlugin } from '@/utils';
 import { t } from '@/i18n';
+import { createPlugin } from '@/utils';
 
+import { backend } from './backend';
 import { menu } from './menu';
 import { renderer } from './renderer';
-import { backend } from './backend';
+import style from './style.css?inline';
 
 import type { SyncedLyricsPluginConfig } from './types';
 
-export default createPlugin({
+export default createPlugin<
+  typeof backend,
+  unknown,
+  typeof renderer,
+  SyncedLyricsPluginConfig
+>({
   name: () => t('plugins.synced-lyrics.name'),
   description: () => t('plugins.synced-lyrics.description'),
   authors: ['Non0reo', 'ArjixWasTaken', 'KimJammer', 'Strvm'],
@@ -21,18 +26,9 @@ export default createPlugin({
     showTimeCodes: false,
     defaultTextString: '♪',
     lineEffect: 'fancy',
+    cinematic: false,
     romanization: true,
-    offsetMs: 0,
-    showTranslation: false,
-    translationTarget: 'app',
-    autoScrollMode: 'center',
-    fontScale: 1,
-    inactiveOpacity: 0.33,
-    activeScale: 1,
-    glowStrength: 0.5,
-    gapIndicatorThresholdMs: 5000,
-    leadMs: 0,
-  } satisfies SyncedLyricsPluginConfig as SyncedLyricsPluginConfig,
+  },
 
   menu,
   renderer,

@@ -1,16 +1,10 @@
-import { createMemo, createSignal } from 'solid-js';
+import { createMemo, runWithOwner } from 'solid-js';
 import { createStore } from 'solid-js/store';
 
 import { getSongInfo } from '@/providers/song-info-front';
 
-import { config } from './renderer';
+import { reactiveOwner } from './reactive-root';
 
-import {
-  formatDurationDelta,
-  makeSongKey,
-  mergeSongCorrection,
-  normalizeLyricResult,
-} from '../helpers';
 import {
   type ProviderName,
   providerNames,
@@ -18,7 +12,7 @@ import {
 } from '../providers';
 import { providers } from '../providers/renderer';
 
-import type { LyricProvider, SearchSongInfo, SongCorrection } from '../types';
+import type { LyricProvider } from '../types';
 import type { SongInfo } from '@/providers/song-info';
 
 type LyricsStore = {
@@ -44,17 +38,12 @@ export const [lyricsStore, setLyricsStore] = createStore<LyricsStore>({
   },
 });
 
-export const currentLyrics = createMemo(() => {
-  const provider = lyricsStore.provider;
-  return lyricsStore.lyrics[provider];
-});
-
-export const [currentSongInfo, setCurrentSongInfo] =
-  createSignal<SongInfo | null>(null);
-export const currentSongKey = createMemo(() => {
-  const info = currentSongInfo();
-  return info ? makeSongKey(info) : null;
-});
+export const currentLyrics = runWithOwner(reactiveOwner, () =>
+  createMemo(() => {
+    const provider = lyricsStore.provider;
+    return lyricsStore.lyrics[provider];
+  }),
+)!;
 
 type VideoId = string;
 
@@ -64,120 +53,9 @@ interface SearchCache {
   data: SearchCacheData;
 }
 
+// TODO: Maybe use localStorage for the cache.
 const searchCache = new Map<VideoId, SearchCache>();
-const correctionStorageKey = 'ytmd-sl-corrections';
-
-const readCorrections = () => {
-  const raw = localStorage.getItem(correctionStorageKey);
-  if (!raw) {
-    return {} as Record<string, SongCorrection>;
-  }
-
-  try {
-    const parsed = JSON.parse(raw) as Record<string, SongCorrection>;
-    return typeof parsed === 'object' && parsed ? parsed : {};
-  } catch {
-    return {} as Record<string, SongCorrection>;
-  }
-};
-
-const writeCorrections = (corrections: Record<string, SongCorrection>) => {
-  localStorage.setItem(correctionStorageKey, JSON.stringify(corrections));
-};
-
-export const [songCorrection, setSongCorrectionState] =
-  createSignal<SongCorrection>({
-    offsetMs: 0,
-    updatedAt: 0,
-  });
-
-export const loadSongCorrection = (songInfo?: SearchSongInfo | null) => {
-  if (!songInfo) {
-    setSongCorrectionState({ offsetMs: 0, updatedAt: 0 });
-    return;
-  }
-
-  const key = makeSongKey(songInfo);
-  const correction = readCorrections()[key];
-  setSongCorrectionState(correction ?? { offsetMs: 0, updatedAt: 0 });
-};
-
-export const saveSongCorrection = (patch: Partial<SongCorrection>) => {
-  const info = currentSongInfo();
-  if (!info) {
-    return;
-  }
-
-  const key = makeSongKey(info);
-  const corrections = readCorrections();
-  const next = mergeSongCorrection(corrections[key], patch);
-  corrections[key] = next;
-  writeCorrections(corrections);
-  setSongCorrectionState(next);
-};
-
-export const clearSongCorrectionProvider = () => {
-  const info = currentSongInfo();
-  if (!info) {
-    return;
-  }
-
-  const key = makeSongKey(info);
-  const corrections = readCorrections();
-  const current = corrections[key];
-  if (!current) {
-    return;
-  }
-
-  const next: SongCorrection = {
-    offsetMs: current.offsetMs ?? 0,
-    updatedAt: Date.now(),
-  };
-  corrections[key] = next;
-  writeCorrections(corrections);
-  setSongCorrectionState(next);
-};
-
-const normalizeProviderState = (
-  providerName: ProviderName,
-  info: SongInfo,
-  result: Awaited<ReturnType<LyricProvider['search']>>,
-): ProviderState => {
-  const normalized = result
-    ? normalizeLyricResult(providerName, info, result)
-    : null;
-
-  if (
-    normalized?.meta?.inexact &&
-    config()?.showLyricsEvenIfInexact === false
-  ) {
-    return { state: 'done', data: null, error: null };
-  }
-
-  return {
-    state: 'done',
-    data: normalized,
-    error: null,
-  };
-};
-
-export const bestResultSummary = createMemo(() => {
-  const current = currentLyrics().data?.meta;
-  if (!current) {
-    return null;
-  }
-
-  return {
-    confidence: current.confidence,
-    durationDelta: formatDurationDelta(current.durationDeltaMs),
-    preview: current.preview,
-  };
-});
-
 export const fetchLyrics = (info: SongInfo) => {
-  setCurrentSongInfo(info);
-  loadSongCorrection(info);
-
   if (searchCache.has(info.videoId)) {
     const cache = searchCache.get(info.videoId)!;
 
@@ -190,6 +68,7 @@ export const fetchLyrics = (info: SongInfo) => {
 
     if (getSongInfo().videoId === info.videoId) {
       setLyricsStore('lyrics', () => {
+        // weird bug with solid-js
         return JSON.parse(JSON.stringify(cache.data)) as typeof cache.data;
       });
     }
@@ -205,30 +84,38 @@ export const fetchLyrics = (info: SongInfo) => {
   searchCache.set(info.videoId, cache);
   if (getSongInfo().videoId === info.videoId) {
     setLyricsStore('lyrics', () => {
+      // weird bug with solid-js
       return JSON.parse(JSON.stringify(cache.data)) as typeof cache.data;
     });
   }
 
   const tasks: Promise<void>[] = [];
 
-  for (const [providerName, provider] of Object.entries(providers) as [
+  // prettier-ignore
+  for (
+    const [providerName, provider] of Object.entries(providers) as [
     ProviderName,
     LyricProvider,
-  ][]) {
+  ][]
+    ) {
     const pCache = cache.data[providerName];
 
     tasks.push(
       provider
         .search(info)
         .then((res) => {
-          const nextState = normalizeProviderState(providerName, info, res);
-          cache.data[providerName] = nextState;
+          pCache.state = 'done';
+          pCache.data = res;
 
           if (getSongInfo().videoId === info.videoId) {
             setLyricsStore('lyrics', (old) => {
               return {
                 ...old,
-                [providerName]: nextState,
+                [providerName]: {
+                  state: 'done',
+                  data: res ? { ...res } : null,
+                  error: null,
+                },
               };
             });
           }
@@ -258,9 +145,6 @@ export const fetchLyrics = (info: SongInfo) => {
 };
 
 export const retrySearch = (provider: ProviderName, info: SongInfo) => {
-  setCurrentSongInfo(info);
-  loadSongCorrection(info);
-
   setLyricsStore('lyrics', (old) => {
     const pCache = {
       state: 'fetching',
@@ -277,11 +161,10 @@ export const retrySearch = (provider: ProviderName, info: SongInfo) => {
   providers[provider]
     .search(info)
     .then((res) => {
-      const nextState = normalizeProviderState(provider, info, res);
       setLyricsStore('lyrics', (old) => {
         return {
           ...old,
-          [provider]: nextState,
+          [provider]: { state: 'done', data: res, error: null },
         };
       });
     })

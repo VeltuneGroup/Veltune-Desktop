@@ -2,11 +2,11 @@ import { type BrowserWindow, globalShortcut } from 'electron';
 import is from 'electron-is';
 import { register as registerElectronLocalShortcut } from 'electron-localshortcut';
 
-import { registerMPRIS } from './mpris';
 import { getSongControls } from '@/providers/song-controls';
 
-import type { ShortcutMappingType, ShortcutsPluginConfig } from './index';
+import { registerMPRIS } from './mpris';
 
+import type { ShortcutMappingType, ShortcutsPluginConfig } from './index';
 import type { BackendContext } from '@/types/contexts';
 
 function _registerGlobalShortcut(
@@ -59,15 +59,20 @@ export const onMainLoad = async ({
   }
 
   function registerAllShortcuts(container: ShortcutMappingType, type: string) {
-    for (const [action, accelerator] of Object.entries(container) as [
-      keyof ShortcutMappingType,
-      string,
-    ][]) {
-      if (!accelerator) {
+    for (const _action in container) {
+      // HACK: _action is detected as string, but it's actually a key of ShortcutMappingType
+      const action = _action as keyof ShortcutMappingType;
+
+      if (!container[action]) {
         continue; // Action accelerator is empty
       }
 
-      console.debug(`Registering ${type} shortcut`, accelerator, ':', action);
+      console.debug(
+        `Registering ${type} shortcut`,
+        container[action],
+        ':',
+        action,
+      );
       const actionCallback: () => void = songControls[action];
       if (typeof actionCallback !== 'function') {
         console.warn('Invalid action', action);

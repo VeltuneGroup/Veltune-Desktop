@@ -1,22 +1,32 @@
-import { createEffect, createSignal, Show } from 'solid-js';
+import { createEffect, createMemo, createSignal, Show } from 'solid-js';
 
-import { canonicalize, romanize, simplifyUnicode } from '../utils';
 import { config } from '../renderer';
+import {
+  canonicalize,
+  convertChineseCharacter,
+  romanize,
+  simplifyUnicode,
+} from '../utils';
 
 interface PlainLyricsProps {
   line: string;
-  translation?: string;
 }
 
 export const PlainLyrics = (props: PlainLyricsProps) => {
   const [romanization, setRomanization] = createSignal('');
+  const text = createMemo(() => {
+    let line = props.line;
+    const convertChineseText = config()?.convertChineseCharacter;
+    if (convertChineseText && convertChineseText !== 'disabled') {
+      line = convertChineseCharacter(line, convertChineseText);
+    }
+    return line;
+  });
 
   createEffect(() => {
-    if (!config()?.romanization) {
-      return;
-    }
+    if (!config()?.romanization) return;
 
-    const input = canonicalize(props.line);
+    const input = canonicalize(text());
     romanize(input).then((result) => {
       setRomanization(canonicalize(result));
     });
@@ -34,21 +44,13 @@ export const PlainLyrics = (props: PlainLyricsProps) => {
     >
       <yt-formatted-string
         text={{
-          runs: [{ text: props.line }],
+          runs: [{ text: text() }],
         }}
       />
-      <Show when={config()?.showTranslation && props.translation?.trim()}>
-        <yt-formatted-string
-          class="translation"
-          text={{
-            runs: [{ text: props.translation! }],
-          }}
-        />
-      </Show>
       <Show
         when={
           config()?.romanization &&
-          simplifyUnicode(props.line) !== simplifyUnicode(romanization())
+          simplifyUnicode(text()) !== simplifyUnicode(romanization())
         }
       >
         <yt-formatted-string

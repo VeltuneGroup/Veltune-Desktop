@@ -2,45 +2,14 @@ import { t } from '@/i18n';
 
 import { providerNames } from './providers';
 
-import type { MenuItemConstructorOptions } from 'electron';
+import type { SyncedLyricsPluginConfig } from './types';
 import type { MenuContext } from '@/types/contexts';
-import type {
-  AutoScrollMode,
-  SyncedLyricsPluginConfig,
-  TranslationTarget,
-} from './types';
-
-const radio = <T>(
-  label: string,
-  checked: boolean,
-  value: T,
-  setValue: (value: T) => void,
-  toolTip?: string,
-) => ({
-  label,
-  type: 'radio' as const,
-  checked,
-  toolTip,
-  click() {
-    setValue(value);
-  },
-});
+import type { MenuItemConstructorOptions } from 'electron';
 
 export const menu = async (
   ctx: MenuContext<SyncedLyricsPluginConfig>,
 ): Promise<MenuItemConstructorOptions[]> => {
   const config = await ctx.getConfig();
-
-  const translationTargets: { label: string; value: TranslationTarget }[] = [
-    { label: 'App language', value: 'app' },
-    { label: 'English', value: 'en' },
-    { label: 'Spanish', value: 'es' },
-    { label: 'French', value: 'fr' },
-    { label: 'German', value: 'de' },
-    { label: 'Japanese', value: 'ja' },
-    { label: 'Korean', value: 'ko' },
-    { label: 'Portuguese', value: 'pt' },
-  ];
 
   return [
     {
@@ -151,6 +120,17 @@ export const menu = async (
       ],
     },
     {
+      label: t('plugins.synced-lyrics.menu.cinematic.label'),
+      toolTip: t('plugins.synced-lyrics.menu.cinematic.tooltip'),
+      type: 'checkbox',
+      checked: config.cinematic,
+      click(item) {
+        ctx.setConfig({
+          cinematic: item.checked,
+        });
+      },
+    },
+    {
       label: t('plugins.synced-lyrics.menu.default-text-string.label'),
       toolTip: t('plugins.synced-lyrics.menu.default-text-string.tooltip'),
       type: 'submenu',
@@ -185,26 +165,60 @@ export const menu = async (
       },
     },
     {
-      label: 'Show translated lyrics',
-      toolTip: 'Display a translated line underneath the source lyric.',
-      type: 'checkbox',
-      checked: config.showTranslation,
-      click(item) {
-        ctx.setConfig({ showTranslation: item.checked });
-      },
-    },
-    {
-      label: 'Translation target',
-      toolTip: 'Choose the language for the translated secondary line.',
-      type: 'submenu',
-      submenu: translationTargets.map(({ label, value }) =>
-        radio(
-          label,
-          config.translationTarget === value,
-          value,
-          (translationTarget) => ctx.setConfig({ translationTarget }),
-        ),
+      label: t('plugins.synced-lyrics.menu.convert-chinese-character.label'),
+      toolTip: t(
+        'plugins.synced-lyrics.menu.convert-chinese-character.tooltip',
       ),
+      type: 'submenu',
+      submenu: [
+        {
+          label: t(
+            'plugins.synced-lyrics.menu.convert-chinese-character.submenu.disabled.label',
+          ),
+          toolTip: t(
+            'plugins.synced-lyrics.menu.convert-chinese-character.submenu.disabled.tooltip',
+          ),
+          type: 'radio',
+          checked:
+            config.convertChineseCharacter === 'disabled' ||
+            config.convertChineseCharacter === undefined,
+          click() {
+            ctx.setConfig({
+              convertChineseCharacter: 'disabled',
+            });
+          },
+        },
+        {
+          label: t(
+            'plugins.synced-lyrics.menu.convert-chinese-character.submenu.simplified-to-traditional.label',
+          ),
+          toolTip: t(
+            'plugins.synced-lyrics.menu.convert-chinese-character.submenu.simplified-to-traditional.tooltip',
+          ),
+          type: 'radio',
+          checked: config.convertChineseCharacter === 'simplifiedToTraditional',
+          click() {
+            ctx.setConfig({
+              convertChineseCharacter: 'simplifiedToTraditional',
+            });
+          },
+        },
+        {
+          label: t(
+            'plugins.synced-lyrics.menu.convert-chinese-character.submenu.traditional-to-simplified.label',
+          ),
+          toolTip: t(
+            'plugins.synced-lyrics.menu.convert-chinese-character.submenu.traditional-to-simplified.tooltip',
+          ),
+          type: 'radio',
+          checked: config.convertChineseCharacter === 'traditionalToSimplified',
+          click() {
+            ctx.setConfig({
+              convertChineseCharacter: 'traditionalToSimplified',
+            });
+          },
+        },
+      ],
     },
     {
       label: t('plugins.synced-lyrics.menu.show-time-codes.label'),
@@ -229,128 +243,6 @@ export const menu = async (
           showLyricsEvenIfInexact: item.checked,
         });
       },
-    },
-    {
-      label: 'Default timing offset',
-      toolTip: 'Apply a base timing offset before any per-song correction.',
-      type: 'submenu',
-      submenu: [-300, -150, 0, 150, 300].map((offsetMs) =>
-        radio(
-          `${offsetMs > 0 ? '+' : ''}${offsetMs}ms`,
-          config.offsetMs === offsetMs,
-          offsetMs,
-          (value) => ctx.setConfig({ offsetMs: value }),
-        ),
-      ),
-    },
-    {
-      label: 'Auto-scroll mode',
-      toolTip: 'Choose how the active lyric line should scroll into view.',
-      type: 'submenu',
-      submenu: [
-        radio<AutoScrollMode>(
-          'Center',
-          config.autoScrollMode === 'center',
-          'center',
-          (value) => ctx.setConfig({ autoScrollMode: value }),
-        ),
-        radio<AutoScrollMode>(
-          'Upper third',
-          config.autoScrollMode === 'upper-third',
-          'upper-third',
-          (value) => ctx.setConfig({ autoScrollMode: value }),
-        ),
-        radio<AutoScrollMode>(
-          'Manual',
-          config.autoScrollMode === 'manual',
-          'manual',
-          (value) => ctx.setConfig({ autoScrollMode: value }),
-        ),
-      ],
-    },
-    {
-      label: 'Font scale',
-      toolTip: 'Adjust the overall lyric size.',
-      type: 'submenu',
-      submenu: [0.9, 1, 1.1, 1.2].map((value) =>
-        radio(
-          `${Math.round(value * 100)}%`,
-          config.fontScale === value,
-          value,
-          (fontScale) => ctx.setConfig({ fontScale }),
-        ),
-      ),
-    },
-    {
-      label: 'Inactive opacity',
-      toolTip: 'Control how dim inactive lines appear.',
-      type: 'submenu',
-      submenu: [0.2, 0.33, 0.45, 0.6].map((value) =>
-        radio(
-          `${Math.round(value * 100)}%`,
-          config.inactiveOpacity === value,
-          value,
-          (inactiveOpacity) => ctx.setConfig({ inactiveOpacity }),
-        ),
-      ),
-    },
-    {
-      label: 'Active line scale',
-      toolTip: 'Make the current lyric line larger or flatter.',
-      type: 'submenu',
-      submenu: [1, 1.05, 1.1, 1.2].map((value) =>
-        radio(
-          `${value.toFixed(2)}x`,
-          config.activeScale === value,
-          value,
-          (activeScale) => ctx.setConfig({ activeScale }),
-        ),
-      ),
-    },
-    {
-      label: 'Glow strength',
-      toolTip: 'Tune the highlight glow on the current line.',
-      type: 'submenu',
-      submenu: [0, 0.25, 0.5, 0.75, 1].map((value) =>
-        radio(
-          `${Math.round(value * 100)}%`,
-          config.glowStrength === value,
-          value,
-          (glowStrength) => ctx.setConfig({ glowStrength }),
-        ),
-      ),
-    },
-    {
-      label: 'Lead time',
-      toolTip:
-        'How early characters light up before their timestamp. Auto adapts to song tempo, 0 = auto.',
-      type: 'submenu',
-      submenu: [
-        radio('Auto', config.leadMs === 0, 0, (leadMs) => ctx.setConfig({ leadMs })),
-        ...([30, 50, 70, 90, 120, 150] as const).map((value) =>
-          radio(
-            `${value}ms`,
-            config.leadMs === value,
-            value,
-            (leadMs) => ctx.setConfig({ leadMs }),
-          ),
-        ),
-      ],
-    },
-    {
-      label: 'Instrumental gap threshold',
-      toolTip:
-        'Show the instrumental label after this much silence between lines.',
-      type: 'submenu',
-      submenu: [3000, 5000, 7000, 9000].map((value) =>
-        radio(
-          `${Math.round(value / 1000)}s`,
-          config.gapIndicatorThresholdMs === value,
-          value,
-          (gapIndicatorThresholdMs) =>
-            ctx.setConfig({ gapIndicatorThresholdMs }),
-        ),
-      ),
     },
   ];
 };

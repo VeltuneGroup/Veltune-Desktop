@@ -53,7 +53,7 @@ export class LyricsGenius implements LyricProvider {
     const { result: { path } } = closestHit;
 
     const html = await fetch(`${this.baseUrl}${path}`).then((res) =>
-      res.text()
+      res.text(),
     );
     const doc = this.domParser.parseFromString(html, 'text/html');
 
@@ -93,11 +93,6 @@ export class LyricsGenius implements LyricProvider {
       title: closestHit.result.title,
       artists: closestHit.result.primary_artists.map(({ name }) => name),
       lyrics,
-      meta: {
-        exact: closestHit.result.title === title,
-        inexact: closestHit.result.title !== title,
-        fallbackUsed: false,
-      },
     };
   }
 }

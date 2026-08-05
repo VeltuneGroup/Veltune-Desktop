@@ -1,54 +1,25 @@
 import { createSignal } from 'solid-js';
-
 import { render } from 'solid-js/web';
 
 import { defaultConfig } from '@/config/defaults';
-import { getSongMenu } from '@/providers/dom-elements';
-import { getSongInfo } from '@/providers/song-info-front';
 import { t } from '@/i18n';
 import {
   isAlbumOrPlaylist,
   isMusicOrVideoTrack,
 } from '@/plugins/utils/renderer/check';
+import { getSongMenu } from '@/providers/dom-elements';
+import { getSongInfo } from '@/providers/song-info-front';
 
 import { DownloadButton } from './templates/download';
 
-import type { RendererContext } from '@/types/contexts';
 import type { DownloaderPluginConfig } from './index';
+import type { RendererContext } from '@/types/contexts';
 
 let download: () => void;
 
 const [downloadButtonText, setDownloadButtonText] = createSignal<string>('');
 
 let buttonContainer: HTMLDivElement | null = null;
-
-const normalizeVideoUrl = (href?: string | null) => {
-  if (!href) {
-    return undefined;
-  }
-
-  const normalizedHref = href.startsWith('podcast/')
-    ? `watch?v=${href.slice('podcast/'.length)}`
-    : href;
-
-  try {
-    return new URL(normalizedHref, `${defaultConfig.url}/`).toString();
-  } catch {
-    return undefined;
-  }
-};
-
-const isPlaylistUrl = (url: string) => {
-  try {
-    const parsedUrl = new URL(url, `${defaultConfig.url}/`);
-    return Boolean(
-      parsedUrl.searchParams.get('list') ||
-        parsedUrl.searchParams.get('playlist'),
-    );
-  } catch {
-    return false;
-  }
-};
 
 const menuObserver = new MutationObserver(() => {
   const menu = getSongMenu();
@@ -88,15 +59,22 @@ export const onRendererLoad = ({
       }
     }
 
-    videoUrl = normalizeVideoUrl(videoUrl);
-
     if (videoUrl) {
-      if (isPlaylistUrl(videoUrl)) {
+      if (videoUrl.startsWith('watch?')) {
+        videoUrl = defaultConfig.url + '/' + videoUrl;
+      }
+
+      if (videoUrl.startsWith('podcast/')) {
+        videoUrl =
+          defaultConfig.url + '/watch?' + videoUrl.replace('podcast/', 'v=');
+      }
+
+      if (videoUrl.includes('?playlist=')) {
         ipc.invoke('download-playlist-request', videoUrl);
         return;
       }
     } else {
-      videoUrl = normalizeVideoUrl(getSongInfo().url) || window.location.href;
+      videoUrl = getSongInfo().url || window.location.href;
     }
 
     ipc.invoke('download-song', videoUrl);
@@ -127,12 +105,8 @@ export const onPlayerApiReady = () => {
     buttonContainer,
   );
 
-  menuObserver.disconnect();
-  menuObserver.observe(
-    document.querySelector('ytmusic-popup-container') ?? document.body,
-    {
-      childList: true,
-      subtree: true,
-    },
-  );
+  menuObserver.observe(document.querySelector('ytmusic-popup-container')!, {
+    childList: true,
+    subtree: true,
+  });
 };

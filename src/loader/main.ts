@@ -1,15 +1,13 @@
-import { type BrowserWindow, ipcMain } from 'electron';
-
 import { deepmerge } from 'deepmerge-ts';
+import { type BrowserWindow, ipcMain } from 'electron';
 import { allPlugins, mainPlugins } from 'virtual:plugins';
 
 import * as config from '@/config';
+import { t } from '@/i18n';
 import { LoggerPrefix, startPlugin, stopPlugin } from '@/utils';
 
-import { t } from '@/i18n';
-
-import type { PluginConfig, PluginDef } from '@/types/plugins';
 import type { BackendContext } from '@/types/contexts';
+import type { PluginConfig, PluginDef } from '@/types/plugins';
 
 const loadedPluginMap: Record<
   string,
@@ -38,32 +36,13 @@ const createContext = (
       win.webContents.send(event, ...args);
     },
     handle: (event: string, listener: CallableFunction) => {
-      ipcMain.handle(event, async (_, ...args: unknown[]) => {
-        try {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-          return await listener(...args);
-        } catch (err) {
-          console.error(
-            LoggerPrefix,
-            `Error in IPC handler for event "${event}" in plugin "${id}":`,
-          );
-          console.error(err);
-          throw err;
-        }
-      });
+      // oxlint-disable-next-line typescript/no-unsafe-return,typescript/no-unsafe-call
+      ipcMain.handle(event, (_, ...args: unknown[]) => listener(...args));
     },
     on: (event: string, listener: CallableFunction) => {
       ipcMain.on(event, (_, ...args: unknown[]) => {
-        try {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-          listener(...args);
-        } catch (err) {
-          console.error(
-            LoggerPrefix,
-            `Error in IPC listener for event "${event}" in plugin "${id}":`,
-          );
-          console.error(err);
-        }
+        // oxlint-disable-next-line typescript/no-unsafe-call
+        listener(...args);
       });
     },
     removeHandler: (event: string) => {

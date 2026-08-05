@@ -4,35 +4,24 @@ import { Visualizer } from './visualizer';
 
 import type { VisualizerPluginConfig } from '../index';
 
-class VudioVisualizer extends Visualizer<Vudio> {
-  name = 'vudio';
-
-  visualizer: Vudio;
+class VudioVisualizer extends Visualizer {
+  private readonly visualizer: Vudio;
 
   constructor(
-    audioContext: AudioContext,
+    _audioContext: AudioContext,
     audioSource: MediaElementAudioSourceNode,
-    visualizerContainer: HTMLElement,
     canvas: HTMLCanvasElement,
     audioNode: GainNode,
     stream: MediaStream,
-    options: VisualizerPluginConfig,
+    config: VisualizerPluginConfig,
   ) {
-    super(
-      audioNode,
-      audioContext,
-      audioSource,
-      visualizerContainer,
-      canvas,
-      stream,
-      options,
-    );
+    super(audioSource, audioNode);
 
     this.visualizer = new Vudio(stream, canvas, {
       width: canvas.width,
       height: canvas.height,
       // Visualizer config
-      ...options,
+      ...config,
     });
 
     this.visualizer.dance();
@@ -45,11 +34,11 @@ class VudioVisualizer extends Visualizer<Vudio> {
     });
   }
 
-  render() {}
-
   destroy() {
     this.visualizer.pause();
-    this._audioNode.disconnect();
+    try {
+      this.audioSource.disconnect(this.audioNode);
+    } catch {}
   }
 }
 

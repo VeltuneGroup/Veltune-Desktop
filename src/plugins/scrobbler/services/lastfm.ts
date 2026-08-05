@@ -2,9 +2,9 @@ import crypto from 'node:crypto';
 
 import { BrowserWindow, dialog, net } from 'electron';
 
-import { ScrobblerBase } from './base';
-
 import { t } from '@/i18n';
+
+import { ScrobblerBase } from './base';
 
 import type { ScrobblerPluginConfig } from '../index';
 import type { SetConfType } from '../main';
@@ -252,91 +252,72 @@ const createToken = async ({
   return json?.token;
 };
 
-let authPromise: Promise<boolean> | null = null;
+let authWindowOpened = false;
+let latestAuthResult = false;
 
 const authenticate = async (
   config: ScrobblerPluginConfig,
   mainWindow: BrowserWindow,
 ) => {
-  if (authPromise) {
-    return authPromise;
-  }
-
-  const url = `https://www.last.fm/api/auth/?api_key=${config.scrobblers.lastfm.apiKey}&token=${config.scrobblers.lastfm.token}`;
-
-  authPromise = new Promise<boolean>((resolve) => {
-    const browserWindow = new BrowserWindow({
-      width: 500,
-      height: 600,
-      show: false,
-      webPreferences: {
-        nodeIntegration: false,
-      },
-      autoHideMenuBar: true,
-      parent: mainWindow,
-      minimizable: false,
-      maximizable: false,
-      paintWhenInitiallyHidden: true,
-      modal: true,
-      center: true,
-    });
-
-    let settled = false;
-
-    const finish = (result: boolean, showFailureDialog = false) => {
-      if (settled) {
-        return;
-      }
-
-      settled = true;
-      authPromise = null;
-      resolve(result);
-
-      if (showFailureDialog) {
-        void dialog.showMessageBox({
-          title: t('plugins.scrobbler.dialog.lastfm.auth-failed.title'),
-          message: t('plugins.scrobbler.dialog.lastfm.auth-failed.message'),
-          type: 'error',
-        });
-      }
-    };
-
-    browserWindow.on('closed', () => {
-      finish(false, true);
-    });
-
-    browserWindow.webContents.on('did-navigate', async (_, newUrl) => {
-      const url = new URL(newUrl);
-      if (!url.hostname.endsWith('last.fm')) {
-        return;
-      }
-
-      if (url.pathname === '/api/auth') {
-        const isApproveScreen =
-          (await browserWindow.webContents.executeJavaScript(
-            "!!document.getElementsByName('confirm').length",
-          )) as boolean;
-
-        if (!isApproveScreen) {
-          finish(true);
-          browserWindow.close();
-        }
-      } else if (url.pathname === '/api/None') {
-        finish(false);
-        browserWindow.close();
-      }
-    });
-
-    void browserWindow.loadURL(url).then(
-      () => {
+  return new Promise<boolean>((resolve) => {
+    if (!authWindowOpened) {
+      authWindowOpened = true;
+      const url = `https://www.last.fm/api/auth/?api_key=${config.scrobblers.lastfm.apiKey}&token=${config.scrobblers.lastfm.token}`;
+      const browserWindow = new BrowserWindow({
+        width: 500,
+        height: 600,
+        show: false,
+        webPreferences: {
+          nodeIntegration: false,
+        },
+        autoHideMenuBar: true,
+        parent: mainWindow,
+        minimizable: false,
+        maximizable: false,
+        paintWhenInitiallyHidden: true,
+        modal: true,
+        center: true,
+      });
+      browserWindow.loadURL(url).then(() => {
         browserWindow.show();
-      },
-      () => {
-        finish(false, true);
-        browserWindow.close();
-      },
-    );
+        browserWindow.webContents.on('did-navigate', async (_, newUrl) => {
+          const url = URL.parse(newUrl);
+          if (url?.hostname.endsWith('last.fm')) {
+            if (url.pathname === '/api/auth') {
+              const isApproveScreen =
+                (await browserWindow.webContents.executeJavaScript(
+                  "!!document.getElementsByName('confirm').length",
+                )) as boolean;
+              // successful authentication
+              if (!isApproveScreen) {
+                resolve(true);
+                latestAuthResult = true;
+                browserWindow.close();
+              }
+            } else if (url.pathname === '/api/None') {
+              resolve(false);
+              latestAuthResult = false;
+              browserWindow.close();
+            }
+          }
+        });
+        browserWindow.on('closed', () => {
+          if (!latestAuthResult) {
+            dialog.showMessageBox({
+              title: t('plugins.scrobbler.dialog.lastfm.auth-failed.title'),
+              message: t('plugins.scrobbler.dialog.lastfm.auth-failed.message'),
+              type: 'error',
+            });
+          }
+          authWindowOpened = false;
+        });
+      });
+    } else {
+      // wait for the previous window to close
+      while (authWindowOpened) {
+        // wait
+      }
+      resolve(latestAuthResult);
+    }
   });
-
-  return authPromise;
 };

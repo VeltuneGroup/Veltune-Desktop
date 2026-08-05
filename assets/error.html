@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Cannot load YouTube Music</title>
+    <title>Cannot load Veltune Desktop</title>
     <style>
       body {
         background: #000;
@@ -43,24 +43,8 @@
 
   <body>
     <div class="container">
-      <p>Cannot load YouTube Music… Internet disconnected?</p>
-      <p id="retry-text">Retrying in <span id="countdown">30</span> seconds…</p>
-      <a class="button" href="#" onclick="reload()">Retry Now</a>
+      <p>Cannot load Veltune Desktop… Internet disconnected?</p>
+      <a class="button" href="#" onclick="reload()">Retry</a>
     </div>
-    <script>
-      let seconds = 30;
-      const countdownElement = document.getElementById('countdown');
-      const retryText = document.getElementById('retry-text');
-
-      const interval = setInterval(() => {
-        seconds--;
-        countdownElement.innerText = seconds;
-        if (seconds <= 0) {
-          clearInterval(interval);
-          retryText.innerText = 'Retrying now...';
-          reload();
-        }
-      }, 1000);
-    </script>
   </body>
 </html>

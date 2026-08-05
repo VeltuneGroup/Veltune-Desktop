@@ -11,8 +11,6 @@
     "moduleResolution": "bundler",
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
-    "baseUrl": ".",
-    "allowJs": true,
     "outDir": "./dist",
     "strict": true,
     "noImplicitAny": true,
@@ -26,7 +24,8 @@
   "exclude": ["./dist"],
   "include": [
     "electron.vite.config.mts",
+    "playwright.config.ts",
     "./src/**/*",
-    "*.config.*js",
+    "*.config.*js"
   ]
 }

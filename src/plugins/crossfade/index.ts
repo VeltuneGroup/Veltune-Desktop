@@ -1,18 +1,16 @@
-import { Innertube } from 'youtubei.js';
-
 import prompt from 'custom-electron-prompt';
-
 import { Howl } from 'howler';
-
-import promptOptions from '@/providers/prompt-options';
-import { getNetFetchAsFetch } from '@/plugins/utils/main';
-import { createPlugin } from '@/utils';
-import { VolumeFader } from './fader';
+import { Innertube } from '\u0079\u006f\u0075\u0074\u0075\u0062\u0065i.js';
 
 import { t } from '@/i18n';
+import { getNetFetchAsFetch } from '@/plugins/utils/main';
+import promptOptions from '@/providers/prompt-options';
+import { createPlugin } from '@/utils';
 
-import type { BrowserWindow } from 'electron';
+import { VolumeFader } from './fader';
+
 import type { RendererContext } from '@/types/contexts';
+import type { BrowserWindow } from 'electron';
 
 export type CrossfadePluginConfig = {
   enabled: boolean;
@@ -282,19 +280,11 @@ export default createPlugin<
         video.addEventListener('timeupdate', transitionBeforeEnd);
       };
 
-      let crossfadeGeneration = 0;
-      let currentFader: VolumeFader | null = null;
-
       const crossfade = (cb: () => void) => {
         if (!isReadyToCrossfade()) {
           cb();
           return;
         }
-
-        currentFader?.stop();
-        currentFader = null;
-
-        const generation = ++crossfadeGeneration;
 
         let resolveTransition: () => void;
         waitForTransition = new Promise<void>((resolve) => {
@@ -309,12 +299,9 @@ export default createPlugin<
           fadeDuration: this.config?.fadeOutDuration,
         });
 
-        currentFader = fader;
-
         // Fade out the music
         video.volume = 0;
         fader.fadeOut(() => {
-          if (generation !== crossfadeGeneration) return;
           resolveTransition();
           cb();
         });

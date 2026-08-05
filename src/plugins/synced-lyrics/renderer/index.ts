@@ -1,16 +1,17 @@
 import { createRenderer } from '@/utils';
 import { waitForElement } from '@/utils/wait-for-element';
 
-import { selectors, tabStates } from './utils';
+import { disposeReactiveRoot } from './reactive-root';
 import { setConfig, setCurrentTime } from './renderer';
 import { fetchLyrics } from './store';
+import { selectors, tabStates } from './utils';
 
-import type { RendererContext } from '@/types/contexts';
-import type { YoutubePlayer } from '@/types/youtube-player';
-import type { SongInfo } from '@/providers/song-info';
 import type { SyncedLyricsPluginConfig } from '../types';
+import type { SongInfo } from '@/providers/song-info';
+import type { RendererContext } from '@/types/contexts';
+import type { MusicPlayer } from '@/types/music-player';
 
-export let _ytAPI: YoutubePlayer | null = null;
+export let _ytAPI: MusicPlayer | null = null;
 export let netFetch: (
   url: string,
   init?: RequestInit,
@@ -21,46 +22,12 @@ export const renderer = createRenderer<
     observerCallback: MutationCallback;
     observer?: MutationObserver;
     videoDataChange: () => Promise<void>;
-    syncClock: () => void;
-    options?: SyncedLyricsPluginConfig;
-    updateTimestampInterval?: number;
-    updateTimestampFrame?: number;
+    updateTimestampInterval?: NodeJS.Timeout | string | number;
   },
   SyncedLyricsPluginConfig
 >({
   onConfigChange(newConfig) {
-    this.options = newConfig;
     setConfig(newConfig);
-    this.syncClock();
-  },
-
-  syncClock() {
-    if (this.updateTimestampInterval !== undefined) {
-      window.clearInterval(this.updateTimestampInterval);
-      this.updateTimestampInterval = undefined;
-    }
-
-    if (this.updateTimestampFrame !== undefined) {
-      window.cancelAnimationFrame(this.updateTimestampFrame);
-      this.updateTimestampFrame = undefined;
-    }
-
-    const updateCurrentTime = () => {
-      setCurrentTime((_ytAPI?.getCurrentTime() ?? 0) * 1000);
-    };
-
-    if (this.options?.preciseTiming) {
-      const tick = () => {
-        updateCurrentTime();
-        this.updateTimestampFrame = window.requestAnimationFrame(tick);
-      };
-
-      tick();
-      return;
-    }
-
-    updateCurrentTime();
-    this.updateTimestampInterval = window.setInterval(updateCurrentTime, 100);
   },
 
   observerCallback(mutations: MutationRecord[]) {
@@ -78,16 +45,20 @@ export const renderer = createRenderer<
     }
   },
 
-  async onPlayerApiReady(api: YoutubePlayer) {
+  async onPlayerApiReady(api: MusicPlayer) {
     _ytAPI = api;
 
     api.addEventListener('videodatachange', this.videoDataChange);
 
-    this.syncClock();
     await this.videoDataChange();
   },
   async videoDataChange() {
-    this.syncClock();
+    if (!this.updateTimestampInterval) {
+      this.updateTimestampInterval = setInterval(
+        () => setCurrentTime((_ytAPI?.getCurrentTime() ?? 0) * 1000),
+        100,
+      );
+    }
 
     // prettier-ignore
     this.observer ??= new MutationObserver(this.observerCallback);
@@ -107,11 +78,14 @@ export const renderer = createRenderer<
   async start(ctx: RendererContext<SyncedLyricsPluginConfig>) {
     netFetch = ctx.ipc.invoke.bind(ctx.ipc, 'synced-lyrics:fetch');
 
-    this.options = await ctx.getConfig();
-    setConfig(this.options);
+    setConfig(await ctx.getConfig());
 
-    ctx.ipc.on('ytmd:update-song-info', (info: SongInfo) => {
+    ctx.ipc.on('peard:update-song-info', (info: SongInfo) => {
       fetchLyrics(info);
     });
+  },
+
+  stop() {
+    disposeReactiveRoot();
   },
 });

@@ -1,15 +1,15 @@
 import { ProviderNames } from './index';
-import { YTMusic } from './YTMusic';
+import { BetterLyrics } from './BetterLyrics';
 import { LRCLib } from './LRCLib';
-import { MusixMatch } from './MusixMatch';
 import { LyricsGenius } from './LyricsGenius';
-import { Boidu } from './Boidu';
+import { MusixMatch } from './MusixMatch';
+import { YTMusic } from './YTMusic';
 
 export const providers = {
   [ProviderNames.YTMusic]: new YTMusic(),
   [ProviderNames.LRCLib]: new LRCLib(),
   [ProviderNames.MusixMatch]: new MusixMatch(),
   [ProviderNames.LyricsGenius]: new LyricsGenius(),
-  [ProviderNames.Boidu]: new Boidu(),
+  [ProviderNames.BetterLyrics]: new BetterLyrics(),
   // [ProviderNames.Megalobiz]: new Megalobiz(), // Disabled because it is too unstable and slow
 } as const;

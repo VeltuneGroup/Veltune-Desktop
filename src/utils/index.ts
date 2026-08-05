@@ -5,7 +5,6 @@ import type {
   PreloadContext,
   RendererContext,
 } from '@/types/contexts';
-
 import type {
   PluginDef,
   PluginConfig,
@@ -91,11 +90,12 @@ export const startPlugin = async <Config extends PluginConfig>(
     // HACK: for bind 'this' to context
     const defContext = def[options.ctx];
     if (defContext && typeof defContext !== 'function') {
-      for (const [key, value] of Object.entries(defContext)) {
+      Object.entries(defContext).forEach(([key, value]) => {
         if (typeof value === 'function') {
-          (defContext as Record<string, unknown>)[key] = value.bind(defContext);
+          // oxlint-disable-next-line typescript/no-unsafe-assignment,typescript/no-unsafe-call,typescript/no-unsafe-member-access
+          defContext[key as keyof typeof defContext] = value.bind(defContext);
         }
-      }
+      });
     }
 
     const start = performance.now();

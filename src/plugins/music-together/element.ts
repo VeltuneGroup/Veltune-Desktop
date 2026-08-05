@@ -30,14 +30,6 @@ export const Popup = (props: PopupProps) => {
   const container = popup.querySelector<HTMLElement>(
     '.music-together-popup-container',
   )!;
-  let onClose: ((event: MouseEvent) => void) | null = null;
-
-  const removeOnCloseListener = () => {
-    if (onClose) {
-      document.removeEventListener('click', onClose);
-      onClose = null;
-    }
-  };
   const items = props.data
     .map((props) => {
       if (props.type === 'item')
@@ -74,8 +66,6 @@ export const Popup = (props: PopupProps) => {
     items,
 
     show(x: number, y: number, anchor?: HTMLElement) {
-      removeOnCloseListener();
-
       let left = x;
       let top = y;
 
@@ -97,12 +87,13 @@ export const Popup = (props: PopupProps) => {
       popup.style.setProperty('pointer-events', 'unset');
 
       setTimeout(() => {
-        onClose = (event: MouseEvent) => {
+        const onClose = (event: MouseEvent) => {
           const isPopupClick = event
             .composedPath()
             .some((element) => element === popup);
           if (!isPopupClick) {
             this.dismiss();
+            document.removeEventListener('click', onClose);
           }
         };
         document.addEventListener('click', onClose);
@@ -118,7 +109,6 @@ export const Popup = (props: PopupProps) => {
     },
 
     dismiss() {
-      removeOnCloseListener();
       popup.style.setProperty('opacity', '0');
       popup.style.setProperty('pointer-events', 'none');
     },

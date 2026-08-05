@@ -1,3 +1,5 @@
+import path from 'node:path';
+
 import { app, BrowserWindow, ipcMain } from 'electron';
 
 import * as config from '@/config';
@@ -5,10 +7,13 @@ import * as config from '@/config';
 export const restart = () => restartInternal();
 
 export const setupAppControls = () => {
-  ipcMain.on('ytmd:restart', restart);
-  ipcMain.handle('ytmd:get-downloads-folder', () => app.getPath('downloads'));
-  ipcMain.on('ytmd:reload', () =>
+  ipcMain.on('peard:restart', restart);
+  ipcMain.handle('peard:get-downloads-folder', () => app.getPath('downloads'));
+  ipcMain.on('peard:reload', () =>
     BrowserWindow.getFocusedWindow()?.webContents.loadURL(config.get('url')),
+  );
+  ipcMain.handle('peard:get-path', (_, ...args: string[]) =>
+    path.join(...args),
   );
 };
 

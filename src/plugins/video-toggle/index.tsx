@@ -1,16 +1,14 @@
+import { createSignal, Show } from 'solid-js';
 import { render } from 'solid-js/web';
 
-import { createSignal, Show } from 'solid-js';
-
-import forceHideStyle from './force-hide.css?inline';
-import buttonSwitcherStyle from './button-switcher.css?inline';
-
-import { createPlugin } from '@/utils';
-import { moveVolumeHud as preciseVolumeMoveVolumeHud } from '@/plugins/precise-volume/renderer';
-import { type ThumbnailElement } from '@/types/get-player-response';
 import { t } from '@/i18n';
 import { type MenuTemplate } from '@/menu';
+import { moveVolumeHud as preciseVolumeMoveVolumeHud } from '@/plugins/precise-volume/renderer';
+import { type ThumbnailElement } from '@/types/get-player-response';
+import { createPlugin } from '@/utils';
 
+import buttonSwitcherStyle from './button-switcher.css?inline';
+import forceHideStyle from './force-hide.css?inline';
 import { VideoSwitchButton } from './templates/video-switch-button';
 
 export type VideoTogglePluginConfig = {
@@ -314,38 +312,37 @@ export default createPlugin({
       };
 
       if (config.mode !== 'native' && config.mode != 'disabled') {
-        document
-          .querySelector<HTMLVideoElement>('#player')
-          ?.prepend(switchButtonContainer);
+        setTimeout(() => {
+          const playerSelector =
+            document.querySelector<HTMLVideoElement>('#player');
+          if (!playerSelector) return;
 
-        setVideoState(!config.hideVideo);
-        forcePlaybackMode();
-        // Fix black video
-        if (video) {
-          video.style.height = 'auto';
-        }
-
-        video?.addEventListener('ytmd:src-changed', videoStarted);
-
-        observeThumbnail();
-        videoStarted();
-
-        switch (config.align) {
-          case 'right': {
-            switchButtonContainer.style.justifyContent = 'flex-end';
-            return;
+          playerSelector.prepend(switchButtonContainer);
+          setVideoState(!config.hideVideo);
+          forcePlaybackMode();
+          if (video) {
+            video.style.height = 'auto';
           }
+          video?.addEventListener('peard:src-changed', videoStarted);
+          observeThumbnail();
+          videoStarted();
+          switch (config.align) {
+            case 'right': {
+              switchButtonContainer.style.justifyContent = 'flex-end';
+              return;
+            }
 
-          case 'middle': {
-            switchButtonContainer.style.justifyContent = 'center';
-            return;
-          }
+            case 'middle': {
+              switchButtonContainer.style.justifyContent = 'center';
+              return;
+            }
 
-          default:
-          case 'left': {
-            switchButtonContainer.style.justifyContent = 'flex-start';
+            default:
+            case 'left': {
+              switchButtonContainer.style.justifyContent = 'flex-start';
+            }
           }
-        }
+        }, 0);
       }
     },
     onConfigChange(newConfig) {
