@@ -2,7 +2,15 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v3.12.2](https://github.com/VeltuneGroup/Veltune-Desktop/compare/v3.12.1...v3.12.2)
+
+- Clean up synced lyrics plugin comments [`0a3ae09`](https://github.com/VeltuneGroup/Veltune-Desktop/commit/0a3ae099d648bb1b8b9035efc0842507cea3565c)
+- Cache Electron downloads and parallelize Linux builds [`17faee1`](https://github.com/VeltuneGroup/Veltune-Desktop/commit/17faee1286b44c53c6c7502a719cbeddbeb3da21)
+- Remove FreeBSD and armv7l build targets [`5e2e1c8`](https://github.com/VeltuneGroup/Veltune-Desktop/commit/5e2e1c8fbe0a760b6ee8f977966317ae187d69a3)
+
 #### [v3.12.1](https://github.com/VeltuneGroup/Veltune-Desktop/compare/v3.12.0...v3.12.1)
+
+> 5 August 2026
 
 - Update BetterLyrics.ts [`#22`](https://github.com/VeltuneGroup/Veltune-Desktop/pull/22)
 - Update changelog for v3.12.0 [`a3b3c18`](https://github.com/VeltuneGroup/Veltune-Desktop/commit/a3b3c1824cedcc97d18096162555f6851c4c45a2)
