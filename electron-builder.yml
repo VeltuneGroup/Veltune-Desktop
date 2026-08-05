@@ -1,8 +1,5 @@
 appId: "com.github.VeltuneGroup.Veltune-Desktop"
 productName: "YouTube Music"
-publish:
-  - provider: generic
-    url: https://github.com/VeltuneGroup/Veltune-Desktop/releases/download/latest
 files:
   - '!*'
   - dist
