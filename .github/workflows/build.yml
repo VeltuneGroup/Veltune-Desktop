@@ -18,7 +18,15 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ macos-26, ubuntu-latest, windows-latest ]
+        include:
+          - os: macos-26
+            linux_arch: ""
+          - os: ubuntu-latest
+            linux_arch: x64
+          - os: ubuntu-latest
+            linux_arch: arm64
+          - os: windows-latest
+            linux_arch: ""
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
@@ -45,6 +53,18 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Cache Electron downloads
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/electron
+            ~/.cache/electron-builder
+            ~/Library/Caches/electron
+            ~/Library/Caches/electron-builder
+            ~/AppData/Local/electron/Cache
+            ~/AppData/Local/electron-builder/Cache
+          key: ${{ runner.os }}-electron-${{ hashFiles('package.json') }}
+
       # Only vite build without release if it is a fork, or it is a pull-request
       - name: Vite Build
         if: github.repository == 'VeltuneGroup/Veltune-Desktop' && github.event_name == 'pull_request'
@@ -59,13 +79,15 @@ jobs:
         run: |
           pnpm release:mac
 
-      - name: Build and release on Linux
+      - name: Build and release on Linux (${{ matrix.linux_arch }})
         if: startsWith(matrix.os, 'ubuntu') && (github.repository == 'VeltuneGroup/Veltune-Desktop' && github.event_name != 'pull_request')
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           sudo apt update
-          pnpm release:linux
+          pnpm clean
+          pnpm build
+          pnpm electron-builder --linux --${{ matrix.linux_arch }} -p always
 
       - name: Build and release on Windows
         if: startsWith(matrix.os, 'windows') && (github.repository == 'VeltuneGroup/Veltune-Desktop' && github.event_name != 'pull_request')
