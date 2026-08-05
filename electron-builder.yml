@@ -50,26 +50,18 @@ linux:
       arch:
         - x64
         - arm64
-        - armv7l
     - target: deb
       arch:
         - x64
         - arm64
-        - armv7l
     - target: rpm
       arch:
         - x64
         - arm64
-    - target: freebsd
-      arch:
-        - x64
-        - arm64
-        - armv7l
     - target: tar.gz
       arch:
         - x64
         - arm64
-        - armv7l
 appImage:
   description: "\u0059\u006f\u0075\u0054\u0075\u0062\u0065\u0020\u004d\u0075\u0073\u0069\u0063 Desktop App bundled with custom plugins"
   category: AudioVideo
