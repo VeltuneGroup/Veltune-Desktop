@@ -2,7 +2,15 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v3.12.1](https://github.com/VeltuneGroup/Veltune-Desktop/compare/v3.12.0...v3.12.1)
+
+- Update BetterLyrics.ts [`#22`](https://github.com/VeltuneGroup/Veltune-Desktop/pull/22)
+- Update changelog for v3.12.0 [`a3b3c18`](https://github.com/VeltuneGroup/Veltune-Desktop/commit/a3b3c1824cedcc97d18096162555f6851c4c45a2)
+- Bump version from 3.12.0 to 3.12.1 [`b58f8f8`](https://github.com/VeltuneGroup/Veltune-Desktop/commit/b58f8f8cdcb44da3a553d799e24d121f7b93e1fe)
+
 #### [v3.12.0](https://github.com/VeltuneGroup/Veltune-Desktop/compare/v3.11.3...v3.12.0)
+
+> 5 August 2026
 
 - Veltune Desktop 3.12.0 [`fd27326`](https://github.com/VeltuneGroup/Veltune-Desktop/commit/fd27326e2e29398a150633d65beacd46c6a56f05)
 - Remove flatpak target from Linux builds [`8a79d74`](https://github.com/VeltuneGroup/Veltune-Desktop/commit/8a79d748f11a1acfed55267017e1767cc24d7659)
