@@ -54,9 +54,6 @@ linux:
         - x64
         - arm64
         - armv7l
-    - target: flatpak
-      arch:
-        - x64
     - target: deb
       arch:
         - x64
@@ -79,23 +76,6 @@ linux:
 appImage:
   description: "\u0059\u006f\u0075\u0054\u0075\u0062\u0065\u0020\u004d\u0075\u0073\u0069\u0063 Desktop App bundled with custom plugins"
   category: AudioVideo
-flatpak:
-  description: "\u0059\u006f\u0075\u0054\u0075\u0062\u0065\u0020\u004d\u0075\u0073\u0069\u0063 Desktop App bundled with custom plugins"
-  category: AudioVideo
-  runtimeVersion: '24.08'
-  baseVersion: '24.08'
-  finishArgs:
-    - '--socket=wayland'
-    - '--socket=x11'
-    - '--share=ipc'
-    - '--device=dri'
-    - '--socket=pulseaudio'
-    - '--share=network'
-    - '--filesystem=xdg-music:rw'
-    - '--talk-name=org.freedesktop.Notifications'
-    - '--talk-name=org.gnome.SessionManager'
-    - '--talk-name=org.kde.StatusNotifierWatcher'
-    - "--own-name=org.mpris.MediaPlayer2.\u0059\u006f\u0075\u0074\u0075\u0062\u0065\u004d\u0075\u0073\u0069\u0063.*"
 deb:
   depends:
     - libgtk-3-0
