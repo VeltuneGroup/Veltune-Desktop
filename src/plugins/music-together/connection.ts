@@ -69,6 +69,10 @@ export class Connection {
       config: {
         iceServers: [
           { urls: 'stun:stun.l.google.com:19302' },
+          { urls: 'stun:stun1.l.google.com:19302' },
+          { urls: 'stun:stun2.l.google.com:19302' },
+          { urls: 'stun:stun3.l.google.com:19302' },
+          { urls: 'stun:stun4.l.google.com:19302' },
           {
             urls: [
               'turn:eu-0.turn.peerjs.com:3478',
@@ -76,14 +80,6 @@ export class Connection {
             ],
             username: 'peerjs',
             credential: 'peerjsp',
-          },
-          {
-            urls: 'stun:freestun.net:3478',
-          },
-          {
-            urls: 'turn:freestun.net:3478',
-            username: 'free',
-            credential: 'free',
           },
         ],
         sdpSemantics: 'unified-plan',
