@@ -62,7 +62,7 @@ unhandled({
 
 // Prevent window being garbage collected
 let mainWindow: Electron.BrowserWindow | null;
-electronUpdater.autoUpdater.autoDownload = false;
+electronUpdater.autoUpdater.autoDownload = true;
 
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
@@ -810,24 +810,22 @@ app.whenReady().then(async () => {
 
   if (!is.dev() && config.get('options.autoUpdates')) {
     const updateTimeout = setTimeout(() => {
-      electronUpdater.autoUpdater.checkForUpdatesAndNotify();
+      electronUpdater.autoUpdater.checkForUpdates();
       clearTimeout(updateTimeout);
     }, 2000);
-    electronUpdater.autoUpdater.on('update-available', () => {
-      const downloadLink =
-        'https://github.com/VeltuneGroup/Veltune-Desktop/releases/latest';
+    electronUpdater.autoUpdater.on('update-downloaded', () => {
       const dialogOptions: Electron.MessageBoxOptions = {
         type: 'info',
         buttons: [
-          t('main.dialog.update-available.buttons.ok'),
-          t('main.dialog.update-available.buttons.download'),
-          t('main.dialog.update-available.buttons.disable'),
+          t('main.dialog.update-downloaded.buttons.restart'),
+          t('main.dialog.update-downloaded.buttons.later'),
+          t('main.dialog.update-downloaded.buttons.disable'),
         ],
-        title: t('main.dialog.update-available.title'),
-        message: t('main.dialog.update-available.message'),
-        detail: t('main.dialog.update-available.detail', { downloadLink }),
-        defaultId: 1,
-        cancelId: 0,
+        title: t('main.dialog.update-downloaded.title'),
+        message: t('main.dialog.update-downloaded.message'),
+        detail: t('main.dialog.update-downloaded.detail'),
+        defaultId: 0,
+        cancelId: 1,
       };
 
       let dialogPromise: Promise<Electron.MessageBoxReturnValue>;
@@ -839,9 +837,9 @@ app.whenReady().then(async () => {
 
       dialogPromise.then((dialogOutput) => {
         switch (dialogOutput.response) {
-          // Download
-          case 1: {
-            shell.openExternal(downloadLink);
+          // Restart and install
+          case 0: {
+            electronUpdater.autoUpdater.quitAndInstall();
             break;
           }
 
@@ -851,7 +849,7 @@ app.whenReady().then(async () => {
             break;
           }
 
-          case 0: {
+          case 1: {
             break;
           }
         }
