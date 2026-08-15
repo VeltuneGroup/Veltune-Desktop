@@ -2,7 +2,15 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v3.12.4](https://github.com/VeltuneGroup/Veltune-Desktop/compare/v3.12.3...v3.12.4)
+
+- Auto-download updates and install on restart [`7464436`](https://github.com/VeltuneGroup/Veltune-Desktop/commit/746443650a3b40f38b77f58b34459deb789a347c)
+- Update changelog for v3.12.3 [`e93bccc`](https://github.com/VeltuneGroup/Veltune-Desktop/commit/e93bccc26d9181cb602e25f70bbe89fcb9005d87)
+- Bump version to 3.12.4 [`354650e`](https://github.com/VeltuneGroup/Veltune-Desktop/commit/354650e6623ce790d6d7c83b32820a88c2b7b8e5)
+
 #### [v3.12.3](https://github.com/VeltuneGroup/Veltune-Desktop/compare/v3.12.2...v3.12.3)
+
+> 7 August 2026
 
 - Add fullscreen support to synced lyrics plugin [`f87df99`](https://github.com/VeltuneGroup/Veltune-Desktop/commit/f87df990dd471b031da0b8cdaac8eb2ec7f67ca5)
 - Update music-together STUN servers [`9a95013`](https://github.com/VeltuneGroup/Veltune-Desktop/commit/9a950134539174ce49ae39445b454abe640ef292)
