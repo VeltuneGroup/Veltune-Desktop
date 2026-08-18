@@ -67,15 +67,15 @@
         "message": "The Application is Unresponsive",
         "title": "Window Unresponsive"
       },
-      "update-downloaded": {
+      "update-available": {
         "buttons": {
           "disable": "Disable Updates",
-          "later": "Later",
-          "restart": "Restart Now"
+          "download": "Download",
+          "ok": "OK"
         },
-        "detail": "The update has been downloaded and will be installed when you restart the app.",
-        "message": "A new version is ready to install",
-        "title": "Update Ready"
+        "detail": "A new version is available and can be downloaded at {{downloadLink}}",
+        "message": "A new version is available",
+        "title": "Update Available"
       }
     },
     "menu": {
