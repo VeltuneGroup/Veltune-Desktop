@@ -2,7 +2,15 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v3.12.5](https://github.com/VeltuneGroup/Veltune-Desktop/compare/v3.12.4...v3.12.5)
+
+- Revert "Auto-download updates and install on restart" [`c0b0821`](https://github.com/VeltuneGroup/Veltune-Desktop/commit/c0b08213392d9628b854bbce9836cf0c2c522d56)
+- Update changelog for v3.12.4 [`50c52d1`](https://github.com/VeltuneGroup/Veltune-Desktop/commit/50c52d14fd7b48d06415e562ea375c54faf442e2)
+- Bump version to 3.12.5 [`c218375`](https://github.com/VeltuneGroup/Veltune-Desktop/commit/c218375e1c00732ce4363349dbffc85b3e76c96b)
+
 #### [v3.12.4](https://github.com/VeltuneGroup/Veltune-Desktop/compare/v3.12.3...v3.12.4)
+
+> 14 August 2026
 
 - Auto-download updates and install on restart [`7464436`](https://github.com/VeltuneGroup/Veltune-Desktop/commit/746443650a3b40f38b77f58b34459deb789a347c)
 - Update changelog for v3.12.3 [`e93bccc`](https://github.com/VeltuneGroup/Veltune-Desktop/commit/e93bccc26d9181cb602e25f70bbe89fcb9005d87)
