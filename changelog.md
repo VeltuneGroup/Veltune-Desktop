@@ -2,7 +2,15 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v3.12.6](https://github.com/VeltuneGroup/Veltune-Desktop/compare/v3.12.5...v3.12.6)
+
+- Update undici to fix Discord RPC CVE [`49724b1`](https://github.com/VeltuneGroup/Veltune-Desktop/commit/49724b15271ae98cc0e076bb778de709a3594fd0)
+- Update changelog for v3.12.5 [`459a4c6`](https://github.com/VeltuneGroup/Veltune-Desktop/commit/459a4c6783bee2ab337b0167af6cc7a6a91159ef)
+- Bump version to 3.12.6 [`9cc3ba0`](https://github.com/VeltuneGroup/Veltune-Desktop/commit/9cc3ba031cf608b332eb2aad6c1c15b2f283d1ae)
+
 #### [v3.12.5](https://github.com/VeltuneGroup/Veltune-Desktop/compare/v3.12.4...v3.12.5)
+
+> 18 August 2026
 
 - Revert "Auto-download updates and install on restart" [`c0b0821`](https://github.com/VeltuneGroup/Veltune-Desktop/commit/c0b08213392d9628b854bbce9836cf0c2c522d56)
 - Update changelog for v3.12.4 [`50c52d1`](https://github.com/VeltuneGroup/Veltune-Desktop/commit/50c52d14fd7b48d06415e562ea375c54faf442e2)
